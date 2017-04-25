@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ChessMiddle.Basics;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,6 +47,25 @@ namespace ChessMiddle.PublicTool
                 haveStr = func();
             }
             return haveStr;
+        }
+
+        /// <summary>
+        /// 提供一个通过值查到键的独享函数
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        internal static List<object> getKeyByValue(Dictionary<char, StateBase> dic, object target)
+        {
+            List<object> keys = new List<object>();
+            for (int i = 0; i < dic.Values.Count; i++)
+            {
+                if(dic.ElementAt(i).Value.Equals(target))
+                {
+                    keys.Add(dic.ElementAt(i).Key);
+                }
+            }
+            return keys;
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Net;
 namespace ChessMiddle.Basics
 {
     /// <summary>
-    /// 一个有基本属性的父类;
+    /// 一个有基本属性的父类(FatherTxBase);
     /// </summary>
     public class FTxBase : ITxBase
     {
@@ -33,7 +33,6 @@ namespace ChessMiddle.Basics
         private string _ip = "";//服务器的IP地址
         private int _bufferSize = 1024;//缓冲区大小
         private int _port = 0;
-        private string _fileLog = "";//记录地址，如果为空表示不记录
         private IPEndPoint _ipEndPoint = null;//终结点地址项目里面用
         /// <summary>
         /// 本地的终结点地址封装；
@@ -65,8 +64,7 @@ namespace ChessMiddle.Basics
         /// </summary>
         public int Port { get => _port; set => _port = value; }
         /// <summary>
-        /// 缓冲区大小；默认为1024字节；不影响最大发送量，如果内存够大或经常发送大数据可以适当加大缓冲区
-        /// 大小；从而可以提高发送速度；否则会自动分包发送，到达对方自动组包;
+        /// 缓冲区大小
         /// </summary>
         public int BufferSize
         {
@@ -85,14 +83,6 @@ namespace ChessMiddle.Basics
         public bool EngineStart
         {
             get { return _engineStart; }
-        }
-        /// <summary>
-        /// 是否记录引擎历史记录；为空表示不记录
-        /// </summary>
-        public string FileLog
-        {
-            get { return _fileLog; }
-            set { _fileLog = value; }
         }
 
         /// <summary>
@@ -164,10 +154,10 @@ namespace ChessMiddle.Basics
         #endregion
 
         /// <summary>
-        /// 服务器向客户端发送字节数据
+        /// 向终端发送字节数据
         /// </summary>
-        /// <param name="stateOne">StateBase</param>
-        /// <param name="data">未加密的数据</param>
+        /// <param name="stateOne">连接对象</param>
+        /// <param name="data">数据</param>
         internal void sendMessage(StateBase stateOne, byte[] data)
         {
             if (stateOne == null)
@@ -175,7 +165,7 @@ namespace ChessMiddle.Basics
             Send(stateOne, data);
         }
         /// <summary>
-        /// 向客户端发送数据,最基础的发送
+        /// 向终端发送数据,最基础的发送
         /// </summary>
         /// <param name="stateOne">StateBase</param>
         /// <param name="data">发送的数据</param>

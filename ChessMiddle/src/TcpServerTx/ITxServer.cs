@@ -47,7 +47,7 @@ namespace ChessMiddle
         /// 下棋
         /// </summary>
         /// <param name="data"></param>
-        void OnChessPlay(Dictionary<string, string> data);
+        void OnChessPlay(List<string> data);
         /// <summary>
         /// 服务器向客户端发送字节数据
         /// </summary>

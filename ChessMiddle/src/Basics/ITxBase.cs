@@ -2,7 +2,7 @@
 namespace ChessMiddle.Basics
 {
     /// <summary>
-    /// 一个有基本属性的接口主要是被ITxClient和ITxServer继承;
+    /// 一个有基本通信属性的接口主要是被ITxClient和ITxServer继承;
     /// </summary>
     public interface ITxBase
     {    
@@ -48,14 +48,6 @@ namespace ChessMiddle.Basics
         /// 启动端口号
         /// </summary>
         int Port
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// 是否记录引擎历史记录；为空表示不记录
-        /// </summary>
-        string FileLog
         {
             get;
             set;

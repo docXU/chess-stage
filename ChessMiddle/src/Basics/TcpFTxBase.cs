@@ -14,12 +14,10 @@ namespace ChessMiddle.Basics
         /// </summary>
         /// <param name="stateOne">TcpState</param>
         /// <param name="reciverByte">数据</param>
-        internal Dictionary<string,string> TcpDateOne(TcpState stateOne, byte[] reciverByte)
+        internal Dictionary<string,object> TcpDateOne(TcpState stateOne, byte[] reciverByte)
         {
             string json =Encoding.Default.GetString(reciverByte);
-            Dictionary<string, string> obj = new Dictionary<string, string>();
-            jsonAndObject.getObjectByJson(json, obj);
-            return obj;
+            return jsonAndDictionary.JsonToDictionary(json);
         }
 
         virtual internal void dataClassify(TcpState stateOne, object dic)

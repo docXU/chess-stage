@@ -20,7 +20,6 @@ namespace SocketClient
                 TxClient.EngineLost += new TxDelegate<string>(engineLost);//当客户端非正常原因断开的时候
                 TxClient.ReconnectionStart += new TxDelegate(reconnectionStart);//当自动重连开始的时候
                 TxClient.StartResult += new TxDelegate<bool, string>(startResult);//当登录完成的时候
-                //TxClient.BufferSize = 12048;//这里大小自己设置，默认为1KB，也就是1024个字节
                 TxClient.StartEngine();
             }
             catch (Exception Ex)
@@ -85,7 +84,7 @@ namespace SocketClient
         /// <param name="e"></param>
         private void button8_Click(object sender, EventArgs e)
         {
-            byte[] closeapi = API.getCloseAPI();
+            byte[] closeapi = API.getCloseAPI("");
             TxClient.sendMessage(closeapi);
         }
         #endregion

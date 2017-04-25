@@ -3,9 +3,12 @@ using ChessMiddle.PublicClass;
 using ChessMiddle.PublicTool;
 using System;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 namespace ChessMiddle
 {
+    //todo 设计一套客户端接口方便其它语言实现
+
     /// <summary>
     /// 面向客户端的主线程类!
     /// </summary>
@@ -51,7 +54,7 @@ namespace ChessMiddle
         internal SocketClient(string ip, int port)
         { Ip = ip; Port = port; }
         #endregion
-
+        
         #region 启动客户端区块
         /// <summary>
         /// 启动客户端,设置超时间在OutTime里设置,无论失败或成功都会触发StartResult事件;
@@ -235,10 +238,10 @@ namespace ChessMiddle
         {
             if (stateBase == null)
                 return;
-            Socket handler = stateBase.WorkSocket;
             try
             {
-                handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), handler);
+                stateBase.SendDate = data;
+                stateBase.WorkSocket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), stateBase);
             }
             catch (Exception e)
             {
@@ -253,8 +256,9 @@ namespace ChessMiddle
         {
             try
             {
-                Socket handler = (Socket)ar.AsyncState;
-                int bytesSent = handler.EndSend(ar);
+                TcpState stateOne = (TcpState)ar.AsyncState;
+                int bytesSent = stateOne.WorkSocket.EndSend(ar);
+                Console.WriteLine(Encoding.Default.GetString(stateOne.SendDate));
             }
             catch (Exception e)
             {
