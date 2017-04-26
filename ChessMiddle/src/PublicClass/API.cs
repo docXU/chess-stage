@@ -11,8 +11,13 @@ namespace ChessMiddle.PublicClass
     public class API
     {
 
+        //S:服务端发，客户端收
+        //C:客户端发，服务端收
+        //S/C：双向的
+
+
         /// <summary>
-        /// 关闭对象
+        /// 关闭对象(C/S)
         /// </summary>
         /// <param name="why">关闭原因</param>
         /// <returns></returns>
@@ -26,7 +31,7 @@ namespace ChessMiddle.PublicClass
         }
 
         /// <summary>
-        /// 违法的走棋接口
+        /// 违法的走棋接口 （S）
         /// </summary>
         /// <returns>why</returns>
         public static byte[] getIllegalAPI(string why)
@@ -39,7 +44,7 @@ namespace ChessMiddle.PublicClass
         }
 
         /// <summary>
-        /// 生成走棋超时接口
+        /// 生成走棋超时接口 (S)
         /// </summary>
         /// <returns>why</returns>
         public static byte[] getTimeoutAPI()
@@ -51,7 +56,7 @@ namespace ChessMiddle.PublicClass
         }
 
         /// <summary>
-        /// 走棋接口
+        /// 走棋接口 (C)
         /// </summary>
         /// <param name="changes">改变序列(字符串表示),"5,3x6,4"...</param>
         /// <param name="role">身份证(连接后会分配一个省份证)</param>
@@ -67,25 +72,26 @@ namespace ChessMiddle.PublicClass
         }
 
         /// <summary>
-        /// 生成发给下一个选手的走棋接口
+        /// 生成发给下一个选手的走棋接口 (S)
         /// </summary>
         /// <param name="now">当前棋局</param>
         /// <param name="size">棋盘规格(用于表示棋盘大小,还原棋局)</param>
         /// <param name="role">下一个选手的身份</param>
         /// <returns></returns>
-        public static byte[] getNextEpisodeAPI(char[] now, string size, string role)
+        public static byte[] getNextEpisodeAPI(char[] now, string size, string role, double limitTimeSecond)
         {
             Dictionary<string, object> obj = new Dictionary<string, object>();
             obj.Add("type", "do_algorithm");
             obj.Add("now", now);
             obj.Add("size", size);
             obj.Add("role", role);
+            obj.Add("limitTimeSecond", limitTimeSecond);
             Console.WriteLine("api:  " + jsonAndDictionary.DictionaryToJson(obj));
             return Encoding.Default.GetBytes(jsonAndDictionary.DictionaryToJson(obj));
         }
 
         /// <summary>
-        /// 生成结果接口
+        /// 生成结果接口 (S)
         /// </summary>
         /// <param name="situation">需要的结论(win|fail|draw)</param>
         /// <returns></returns>
