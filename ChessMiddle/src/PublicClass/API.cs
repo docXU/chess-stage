@@ -77,6 +77,7 @@ namespace ChessMiddle.PublicClass
         /// <param name="now">当前棋局</param>
         /// <param name="size">棋盘规格(用于表示棋盘大小,还原棋局)</param>
         /// <param name="role">下一个选手的身份</param>
+        /// <param name="limitTimeSecond">运算等待时间</param>
         /// <returns></returns>
         public static byte[] getNextEpisodeAPI(char[] now, string size, string role, double limitTimeSecond)
         {
