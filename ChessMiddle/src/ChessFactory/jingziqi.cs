@@ -5,17 +5,17 @@ using System.Text;
 
 namespace ChessMiddle.ChessFactory
 {
-    public class jingziqi
+    class jingziqi :IChess
     {
-        private char[] chess;
+        private char[] _chess;
         private char[,] chess2d;
         private int _width;
         private int _height;
         private char[] _role;
         public jingziqi(int width,int height)
         {
-            Role = new char[]{ 'x','o','-'};
-            chess = new char[width * height];
+            _role = new char[]{ 'x','o','-'};
+            _chess = new char[width * height];
             chess2d = new char[width, height];
             _width = width;
             _height = height;
@@ -28,14 +28,14 @@ namespace ChessMiddle.ChessFactory
             int size = Width * Height;
             for(int i = 0; i<size;i++)
             {
-                chess[i] = '-';
+                _chess[i] = '-';
             }
         }
 
-        public int Width { get => _width; set => _width = value; }
-        public int Height { get => _height; set => _height = value; }
-        public char[] Role { get => _role; set => _role = value; }
-        public char[] Chess { get => chess; set => chess = value; }
+        public int Width { get => _width;  }
+        public int Height { get => _height;}
+        public char[] Role { get => _role;  }
+        public char[] Chess { get => _chess; }
         public string Size { get => "" + Width + "-" + Height; }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ChessMiddle.ChessFactory
         /// <param name="actionMove">包含棋步的序列</param>
         /// <param name="role">哪一方</param>
         /// <returns>是否合法</returns>
-        public bool doChess(List<string> actionMove, char role)
+        public bool DoChess(List<string> actionMove, char role)
         {
             string position = actionMove[0];
             int x = int.Parse(position.Split(',')[0]);
@@ -53,11 +53,12 @@ namespace ChessMiddle.ChessFactory
                 return false;
             if (role == '-' ||Array.IndexOf(Role, role) == -1)
                 return false;
+
             int arrayPosition = (x - 1) * Width + y-1;
             //那个位置为空
-            if(chess[arrayPosition]=='-')
+            if(_chess[arrayPosition]=='-')
             {
-                chess[arrayPosition] = role;
+                _chess[arrayPosition] = role;
                 return true;
             }
             return false;
@@ -67,12 +68,12 @@ namespace ChessMiddle.ChessFactory
         /// todo - 检测当前局势
         /// </summary>
         /// <returns></returns>
-        public char situation()
+        public char GetSituation()
         {
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
                 {
-                    chess2d[i, j] = chess[i * Width + j];
+                    chess2d[i, j] = _chess[i * Width + j];
                 }
 
             for (int i=0;i<Width;i++)
@@ -83,6 +84,11 @@ namespace ChessMiddle.ChessFactory
                 }
             }
             return 'x';
+        }
+
+        public void DefaultDo(char role)
+        {
+            throw new NotImplementedException();
         }
     }
 }

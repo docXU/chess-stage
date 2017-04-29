@@ -1,9 +1,7 @@
 ﻿using ChessMiddle.Basics;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ChessMiddle.PublicTool
@@ -66,6 +64,20 @@ namespace ChessMiddle.PublicTool
                 }
             }
             return keys;
+        }
+
+        internal static int IndexOfKeys(Dictionary<char, StateBase> keys, char value)
+        {
+            int index = -1;
+            foreach (char o in keys.Keys)
+            {
+                index++;
+                if(o==value)
+                {
+                    return index;
+                }
+            }
+            return index;
         }
     }
 }

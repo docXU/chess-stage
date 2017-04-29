@@ -20,7 +20,7 @@ namespace ChessMiddle
         /// <summary>
         /// 当有客户发送棋步的时候, 触发事件, 参数是棋局改变的序列
         /// </summary>
-        event TxDelegate<List<string>> PlayChess;
+        event TxDelegate<List<string>, char> PlayChess;
         /// <summary>
         /// 当前客户端数量
         /// </summary>
@@ -46,8 +46,9 @@ namespace ChessMiddle
         /// <summary>
         /// 下棋
         /// </summary>
-        /// <param name="data"></param>
-        void OnChessPlay(List<string> data);
+        /// <param name="data">棋的改变序列</param>
+        /// <param name="result">现在的棋局情况</param>
+        void OnChessPlay(List<string> data,char result);
         /// <summary>
         /// 服务器向客户端发送字节数据
         /// </summary>

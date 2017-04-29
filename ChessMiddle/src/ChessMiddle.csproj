@@ -53,6 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Basics\TcpFTxBase.cs" />
+    <Compile Include="ChessFactory\Checkers.cs" />
+    <Compile Include="ChessFactory\IChess.cs" />
     <Compile Include="ChessFactory\jingziqi.cs" />
     <Compile Include="PublicClass\API.cs" />
     <Compile Include="PublicTool\jsonAndDictionary.cs" />

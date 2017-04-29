@@ -6,7 +6,7 @@ using System.Text;
 namespace ChessMiddle.PublicClass
 {
     /// <summary>
-    /// 通用传输对象
+    /// 生成字节形式通用传输对象
     /// </summary>
     public class API
     {
