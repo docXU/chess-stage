@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ChessMiddle.ChessFactory
 {
-    //todo - 实现函数功能
+    //todo - 实现函数功能(井子棋已实现)
     class Checkers : IChess
     {
         /// <summary>
@@ -58,7 +58,20 @@ namespace ChessMiddle.ChessFactory
 
         public char GetResult()
         {
-            return '1';
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                {
+                    _chess2d[i, j] = _chess[i * Width + j];
+                }
+
+            for (int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    //if(chess2d[i,j]!=chess2d[])
+                }
+            }
+            return 'x';
         }
 
         public List<string> DefaultDo(char role)

@@ -80,6 +80,10 @@ namespace ChessMiddle.ChessFactory
             return false;
         }
 
+        /// <summary>
+        /// 获得当前棋局的结果
+        /// </summary>
+        /// <returns>代表当前结果的字符</returns>
         public char GetResult()
         {
             int size = Width * Height;
@@ -137,6 +141,11 @@ namespace ChessMiddle.ChessFactory
             return DRAW;
         }
 
+        /// <summary>
+        /// 执行默认步
+        /// </summary>
+        /// <param name="role">执行者</param>
+        /// <returns>默认步的动作序列</returns>
         public List<string> DefaultDo(char role)
         {
             List<string> action = new List<string>();

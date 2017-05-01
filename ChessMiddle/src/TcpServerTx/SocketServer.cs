@@ -27,7 +27,7 @@ namespace ChessMiddle
                 state = new List<TcpState>();
         }
 
-        private Checkers _chess;
+        private jingziqi _chess;
         //棋局监控属性
         private Dictionary<char, StateBase> roleTable =
             new Dictionary<char, StateBase>();//角色分配表
@@ -100,7 +100,7 @@ namespace ChessMiddle
             if (EngineStart)
                 return;
             //实例化一个镜字棋
-            _chess = new Checkers(10, 10);
+            _chess = new jingziqi(3, 3);
             _clientMax = _chess.Role.Length;
             try
             {
@@ -387,6 +387,7 @@ namespace ChessMiddle
         /// 下棋
         /// </summary>
         /// <param name="data">关键数据</param>
+        /// <param name="result">棋步下完后的结果</param>
         public void OnChessPlay(List<string> data, char result)
         {
             CommonMethod.eventInvoket(() => { PlayChess(data, result); });
