@@ -39,6 +39,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.textBox_port = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -63,6 +64,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.textBox1);
             this.groupBox3.Controls.Add(this.label_zt);
             this.groupBox3.Controls.Add(this.label_all);
             this.groupBox3.Controls.Add(this.groupBox2);
@@ -71,7 +73,7 @@
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Location = new System.Drawing.Point(12, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(414, 393);
+            this.groupBox3.Size = new System.Drawing.Size(414, 552);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "TCP服务器";
@@ -84,7 +86,7 @@
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(9, 54);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(398, 188);
+            this.groupBox2.Size = new System.Drawing.Size(398, 344);
             this.groupBox2.TabIndex = 19;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "收到的消息";
@@ -101,7 +103,7 @@
             this.listView1.Location = new System.Drawing.Point(3, 17);
             this.listView1.Name = "listView1";
             this.listView1.ShowItemToolTips = true;
-            this.listView1.Size = new System.Drawing.Size(392, 168);
+            this.listView1.Size = new System.Drawing.Size(392, 324);
             this.listView1.TabIndex = 10;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -148,11 +150,18 @@
             this.label1.Text = "监听端口：";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(42, 413);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(337, 93);
+            this.textBox1.TabIndex = 20;             
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(430, 417);
+            this.ClientSize = new System.Drawing.Size(430, 570);
             this.Controls.Add(this.groupBox3);
             this.Name = "Server";
             this.Text = "服务器";
@@ -176,6 +185,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBox_port;
         private System.Windows.Forms.Label label1;
-
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

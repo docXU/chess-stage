@@ -37,6 +37,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
+            this.textBox4 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,11 +54,11 @@
             // textBox1
             // 
             this.textBox1.AcceptsReturn = true;
-            this.textBox1.Location = new System.Drawing.Point(19, 203);
+            this.textBox1.Location = new System.Drawing.Point(19, 233);
             this.textBox1.MaxLength = 327670;
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(177, 66);
+            this.textBox1.Size = new System.Drawing.Size(177, 36);
             this.textBox1.TabIndex = 2;
             // 
             // label1
@@ -96,6 +97,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.textBox4);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.button8);
             this.groupBox1.Controls.Add(this.textBox1);
@@ -113,22 +115,31 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(121, 167);
+            this.button1.Location = new System.Drawing.Point(126, 158);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 7;
-            this.button1.Text = "button1";
+            this.button1.Text = "发送走棋";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(19, 167);
+            this.button8.Location = new System.Drawing.Point(79, 197);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(88, 30);
             this.button8.TabIndex = 6;
             this.button8.Text = "发送关闭api";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(15, 158);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(105, 21);
+            this.textBox4.TabIndex = 8;
+            this.textBox4.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
             // 
             // Client
             // 
@@ -154,5 +165,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBox4;
     }
 }

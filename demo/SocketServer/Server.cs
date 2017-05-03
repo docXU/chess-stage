@@ -11,6 +11,7 @@ namespace SocketServer
     {
         #region TCPServer服务器
 
+        private char[,] chess;
         private ITxServer server = null;
         /// <summary>
         /// 当接收到来之客户端的文本信息的时候
@@ -29,8 +30,10 @@ namespace SocketServer
         /// <param name="bytes"></param>
         private void acceptBytes(IPEndPoint ipEndPoint, byte[] bytes)
         {
+            ListViewItem item = new ListViewItem(new string[] { DateTime.Now.ToString(),
+                ipEndPoint.ToString(), System.Text.Encoding.Default.GetString(bytes) });
+            this.listView1.Items.Insert(0, item);
             //MessageBox.Show(bytes.Length.ToString());
-            //this.pictureBox1.Image = objectByte.ReadImage(bytes);
         }
         /// <summary>
         /// 当有客户端连接上来的时候
@@ -56,6 +59,7 @@ namespace SocketServer
         private void disconnection(IPEndPoint ipEndPoint, string str)
         {
             show(ipEndPoint, "下线");
+            chessInit();
         }
         /// <summary>
         /// 当服务器完全关闭的时候
@@ -92,12 +96,25 @@ namespace SocketServer
                 server.Disconnection += new TxDelegate<IPEndPoint, string>(disconnection);
                 server.EngineClose += new TxDelegate(engineClose);
                 server.EngineLost += new TxDelegate<string>(engineLost);
+                server.PlayChess += new TxDelegate<List<string>, char, char>(playChess);
                 server.StartEngine();
                 this.button1.Enabled = false;
             }
             catch (Exception Ex) { MessageBox.Show(Ex.Message); }
 
         }
+
+        private void playChess(List<string> actionMove,char role, char result)
+        {
+            foreach (string i in actionMove)
+            {
+                int x = int.Parse(i.Split(',')[0]);
+                int y = int.Parse(i.Split(',')[1]);
+                chess[x - 1, y - 1] = role;
+            }
+            convertToUI(chess, result);
+        }
+
         /// <summary>
         /// 下面显示的
         /// </summary>
@@ -109,7 +126,42 @@ namespace SocketServer
             label_all.Text = "当前在线人数:" + this.server.ClientNumber.ToString();
         }
         #endregion
+
         public Server()
-        { InitializeComponent(); }
+        {
+            InitializeComponent();
+            chessInit();
+
+        }
+
+        private void chessInit()
+        {
+            chess = new char[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    chess[i, j] = ' ';
+                }
+            }
+            convertToUI(chess, '~');
+        }
+
+        private void convertToUI(char[,] chess, char result)
+        {
+            string UI = "";
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (j < 2)
+                        UI += chess[i, j].ToString() + "|";
+                    else
+                        UI += chess[i, j];
+                }
+                UI += "\r\n";
+            }
+            this.textBox1.Text = UI + "\r\n 局势:"+result;
+        }
     }
 }

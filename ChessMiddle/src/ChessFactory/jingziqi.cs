@@ -15,7 +15,7 @@ namespace ChessMiddle.ChessFactory
         /// <summary>
         /// 平局
         /// </summary>
-        public char DRAW { get => 'd';  }
+        public char DRAW { get => 'd'; }
 
         private char[] _chess;
         private char[,] _chess2d;
@@ -24,7 +24,7 @@ namespace ChessMiddle.ChessFactory
         private char[] _role;
         public jingziqi(int width, int height)
         {
-            _role = new char[] { 'x', 'o', NOTHING };
+            _role = new char[] { 'x', 'o' };
             _chess = new char[width * height];
             _chess2d = new char[width, height];
             _width = width;
@@ -55,7 +55,8 @@ namespace ChessMiddle.ChessFactory
         public string Size { get => "" + Width + "-" + Height; }
 
         /// <summary>
-        /// 井子棋下子
+        /// 井子棋下子,并返回合法性
+        /// (序列代表走子的坐标,下限从1开始)
         /// </summary>
         /// <param name="actionMove">包含棋步的序列</param>
         /// <param name="role">哪一方</param>
@@ -71,12 +72,15 @@ namespace ChessMiddle.ChessFactory
                 return false;
 
             int arrayPosition = (x - 1) * Width + y - 1;
+
             //那个位置为空
             if (_chess[arrayPosition] == NOTHING)
             {
                 _chess[arrayPosition] = role;
+                _chess2d[x - 1, y - 1] = role;
                 return true;
             }
+
             return false;
         }
 
@@ -86,56 +90,60 @@ namespace ChessMiddle.ChessFactory
         /// <returns>代表当前结果的字符</returns>
         public char GetResult()
         {
-            int size = Width * Height;
-            for (int i = 0; i < size; i++)
-            {
-                if (_chess[i] == NOTHING)
-                    return NOT_DONE;
-            }
-
             //检测某列是否有胜者
-            bool isVertical = true;
+            bool isVertical;
             for (int i = 0; i < _width; i++)
             {
+                isVertical = true;
                 for (int j = 0; j < _width - 1; j++)
                 {
-                    if (_chess2d[j, i] != _chess2d[j+1, i])
+                    if (_chess2d[j, i] != _chess2d[j + 1, i])
                         isVertical = false;
                 }
-                if (isVertical == true)
-                    return _chess2d[i, 0];
-                
+                if (_chess2d[i, 0] != NOTHING && isVertical == true)
+                    return _chess2d[0, i];
             }
 
             //检测某行是否有胜者
-            bool isHorizontal = true;
+            bool isHorizontal;
             for (int i = 0; i < _height; i++)
             {
+                isHorizontal = true;
                 for (int j = 0; j < _height - 1; j++)
                 {
                     if (_chess2d[i, j] != _chess2d[i, j + 1])
                         isHorizontal = false;
                 }
-                if (isHorizontal == true)
+                if (_chess2d[i, 0] != NOTHING && isHorizontal == true)
                     return _chess2d[i, 0];
             }
 
-            for(int i=0;i<_width-1;i++)
+
+            bool isSlash = true;
+            for (int i = 0; i < _width - 1; i++)
             {
-                bool isSlash = true;
+
                 if (_chess2d[i, i] != _chess2d[i + 1, i + 1])
                     isSlash = false;
-                if (isSlash == true)
-                    return _chess2d[0, 0];
             }
+            if (_chess2d[0, 0] != NOTHING && isSlash == true)
+                return _chess2d[0, 0];
 
-            for (int i = _width-1; i > 0 ; i--)
+            isSlash = true;
+            for (int i = _width - 1; i > 0; i--)
             {
-                bool isSlash = true;
-                if (_chess2d[i, Width-i-1] != _chess2d[i -1, Width - i - 2])
+                if (_chess2d[i, Width - i - 1] != _chess2d[i - 1, Width - i])
                     isSlash = false;
-                if (isSlash == true)
-                    return _chess2d[0, _width - 1];
+            }
+            if (_chess2d[0, _width - 1] != NOTHING && isSlash == true)
+                return _chess2d[0, _width - 1];
+
+
+            int size = Width * Height;
+            for (int i = 0; i < size; i++)
+            {
+                if (_chess[i] == NOTHING)
+                    return NOT_DONE;
             }
 
             return DRAW;
@@ -149,19 +157,24 @@ namespace ChessMiddle.ChessFactory
         public List<string> DefaultDo(char role)
         {
             List<string> action = new List<string>();
-            for(int i=0;i<=_width;i++)
+            for (int i = 0; i < _width; i++)
             {
-                for(int j=0;j<_height;j++)
+                int j;
+                for (j = 0; j < _height; j++)
                 {
                     if (_chess2d[i, j] == NOTHING)
                     {
                         //example
                         //在(1,2)的位置加一个x
                         //+/1,2/x
-                        action.Add("+/" + i + "," + j + "/" + role);
+                        action.Add("" + (i + 1) + "," + (j + 1));
+                        DoChess(action, role);
                         break;
                     }
                 }
+                //只需找到一个即可
+                if (j < _height)
+                    break;
             }
             return action;
         }

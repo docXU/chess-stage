@@ -17,5 +17,15 @@
     /// <typeparam name="T2">T2</typeparam>
     /// <param name="object1">object1</param>
     /// <param name="object2">object2</param>
-    public delegate void TxDelegate<T1,T2>(T1 object1,T2 object2);
+    public delegate void TxDelegate<T1, T2>(T1 object1, T2 object2);
+    /// <summary>
+    /// 带三个参数的委托
+    /// </summary>
+    /// <typeparam name="T1">T1</typeparam>
+    /// <typeparam name="T2">T2</typeparam>
+    /// <typeparam name="T3">T3</typeparam>
+    /// <param name="object1">object1</param>
+    /// <param name="object2">object2</param>
+    /// <param name="object3">object3</param>
+    public delegate void TxDelegate<T1, T2, T3>(T1 object1, T2 object2, T3 object3);
 }

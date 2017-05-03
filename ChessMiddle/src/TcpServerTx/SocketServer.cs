@@ -3,6 +3,7 @@ using ChessMiddle.ChessFactory;
 using ChessMiddle.PublicClass;
 using ChessMiddle.PublicTool;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -50,7 +51,7 @@ namespace ChessMiddle
         /// <summary>
         /// 在UI上下棋
         /// </summary>
-        public event TxDelegate<List<string>, char> PlayChess;
+        public event TxDelegate<List<string>,char, char> PlayChess;
         /// <summary>
         /// 当前客户端数量
         /// </summary>
@@ -131,16 +132,15 @@ namespace ChessMiddle
                 stateOne = new TcpState(handler, BufferSize);
 
                 /*可假色只有两个玩家*/
-                int curRoleCount = state.Count;
+                int curRoleCount = roleTable.Count;
                 if (curRoleCount < _clientMax)
                 {
                     roleTable.Add(_chess.Role[curRoleCount], stateOne);
                     loginSuccess(stateOne);
                     stateOne.WorkSocket.BeginReceive(stateOne.Buffer, 0, stateOne.Buffer.Length
                         , 0, new AsyncCallback(ReadCallback), stateOne);
-                    curRoleCount++;
                     //玩家全部到齐
-                    if (curRoleCount == _clientMax)
+                    if (curRoleCount == _clientMax-1)
                     {
                         currentToken = (TcpState)roleTable[_chess.Role[0]];
                         //给第一个玩家发送开始游戏的指令
@@ -169,6 +169,7 @@ namespace ChessMiddle
         /// <param name="ar"></param>
         private void ReadCallback(IAsyncResult ar)
         {
+            //todo 当客户端断开源码会自动执行这个回调? 如何避免
             TcpState stateOne = (TcpState)ar.AsyncState;
             Socket handler = stateOne.WorkSocket;
             Console.WriteLine("in callback");
@@ -180,6 +181,7 @@ namespace ChessMiddle
                 {
                     byte[] haveDate = ReceiveDateOne.DateOneManage(stateOne, bytesRead);//接收完成之后对数组进行重置
                     //数据处理
+                    OnAcceptByte(stateOne.IpEndPoint, haveDate);
                     dataClassify(stateOne, TcpDateOne(stateOne, haveDate));
                 }
                 handler.BeginReceive(stateOne.Buffer, 0, stateOne.Buffer.Length,
@@ -211,29 +213,32 @@ namespace ChessMiddle
                         if (!stateOne.IpEndPoint.Equals(currentToken.IpEndPoint))
                             return;
                         char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
+                        List<string> changes = new List<string>();
+                        foreach (string i in ((ArrayList)data["changes"]))
+                        {
+                            changes.Add(i);
+                        }
+
                         //下棋并检测合法性
                         //合法性失败发送违法api,并允许其继续在限制时间内下棋
-                        if (!_chess.DoChess((List<string>)data["changes"], role))
+                        if (!_chess.DoChess(changes, role))
                         {
                             Send(stateOne, API.getIllegalAPI("棋步违法!"));
+                            //先强制中断
+                            socketRemove(stateOne, "违法棋");
                             break;
                         }
                         //多线程可同时读一个内存变量,而写要加锁
                         stateOne.ThinkInTime = true;
+
                         char result = _chess.GetResult();
+                        //todo 将行动的棋显示在UI上
+                        OnChessPlay(changes, role, result);
                         sendResult(result);
 
-                        //todo 将行动的棋显示在UI上
-                        OnChessPlay((List<string>)data["changes"], result);
+                        if (result == _chess.NOT_DONE)
+                            refreshAndNext(stateOne);
 
-                        //令牌更新
-                        int oldStatePostion = state.IndexOf(stateOne);
-                        int newStatePostion = oldStatePostion + 1 == this.state.Count
-                            ? 0 : oldStatePostion + 1;
-                        currentToken = this.state[newStatePostion];
-
-                        sendNextEpisode(currentToken,
-                            (CommonMethod.getKeyByValue(roleTable, currentToken)[0].ToString()));
                         break;
                     }
                 default:
@@ -252,7 +257,7 @@ namespace ChessMiddle
             {
                 if (CommonMethod.IndexOfKeys(roleTable, result) == -1)
                 {
-                    //平局
+                    //平局(除了角色表外的其它字符均可代表)
                     foreach (StateBase s in roleTable.Values)
                     {
                         Send(s, API.getResultAPI("draw"));
@@ -260,7 +265,7 @@ namespace ChessMiddle
                 }
                 else
                 {
-                    //有人获胜
+                    //有人获胜(针对角色表)
                     foreach (char player in roleTable.Keys)
                     {
                         if (player == result)
@@ -273,11 +278,40 @@ namespace ChessMiddle
                         }
                     }
                 }
+                MatchFinish();
+            }
+        }
+
+        private void MatchFinish()
+        {
+            _chess = new jingziqi(3, 3);
+            _clientMax = _chess.Role.Length;
+            TcpState[] temp =new TcpState[state.Count];
+            state.CopyTo(temp);
+            //休眠10秒看结果
+            Thread.Sleep(10000);
+            foreach (TcpState t in temp)
+            {
+                socketRemove(t, "比赛结束");
             }
         }
         #endregion
 
         #region 通知下一个玩家并检测是否超时
+
+        private void refreshAndNext(StateBase state)
+        {
+            TcpState stateOne = (TcpState)state;
+
+            //令牌更新
+            int oldStatePostion = this.state.IndexOf(stateOne);
+            int newStatePostion = oldStatePostion + 1 == this.state.Count
+                ? 0 : oldStatePostion + 1;
+            currentToken = this.state[newStatePostion];
+
+            sendNextEpisode(currentToken,
+                (CommonMethod.getKeyByValue(roleTable, currentToken)[0].ToString()));
+        }
 
         /// <summary>
         /// 向下一个选手发送棋局信息
@@ -300,7 +334,7 @@ namespace ChessMiddle
         private void ThinkTimeout(object state)
         {
             TcpState stateOne = (TcpState)state;
-            DateTime startTime = stateOne.LastCallTime;
+            DateTime startTime = DateTime.Now;
 
             while (true)
             {
@@ -313,17 +347,21 @@ namespace ChessMiddle
 
                 if ((DateTime.Now - startTime).TotalSeconds > limitThinkSeconds)
                 {
+                    if (!clientCheck(stateOne.IpEndPoint))
+                        return;
                     Send(stateOne, API.getTimeoutAPI());
                     //使用默认走棋方法
-                    List<string> changes = _chess.DefaultDo((char)CommonMethod.getKeyByValue(roleTable, stateOne)[0]);
+                    char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
+                    List<string> changes = _chess.DefaultDo(role);
                     char result = _chess.GetResult();
+                    OnChessPlay(changes, role, result);
                     sendResult(result);
-                    OnChessPlay(changes, result);
+                    if (result == _chess.NOT_DONE)
+                        refreshAndNext(stateOne);
                     return;
                 }
             }
         }
-
         #endregion
 
         #region 向客户端发送数据的区块
@@ -387,10 +425,11 @@ namespace ChessMiddle
         /// 下棋
         /// </summary>
         /// <param name="data">关键数据</param>
+        /// <param name="role">玩家身份</param>
         /// <param name="result">棋步下完后的结果</param>
-        public void OnChessPlay(List<string> data, char result)
+        public void OnChessPlay(List<string> data, char role, char result)
         {
-            CommonMethod.eventInvoket(() => { PlayChess(data, result); });
+            CommonMethod.eventInvoket(() => { PlayChess(data, role, result); });
         }
 
         /// <summary>
@@ -441,6 +480,7 @@ namespace ChessMiddle
             if (stateOne == null || ClientNumber == 0)
                 return;
             state.Remove(stateOne);
+            roleTable.Remove((char)CommonMethod.getKeyByValue(roleTable, stateOne)[0]);
             Send(stateOne, API.getCloseAPI(""));//发送一个强制关闭的代码过去
         }
         /// <summary>
@@ -463,6 +503,7 @@ namespace ChessMiddle
             if (stateOne == null)
                 return;
             stateOne.WorkSocket.Close();
+            roleTable.Remove((char)CommonMethod.getKeyByValue(roleTable, stateOne)[0]);
             if (state.Remove(stateOne))//当没有登录的时候断掉，不触发下面的事件
             {
                 CommonMethod.eventInvoket(() => { Disconnection(stateOne.IpEndPoint, str); }); //当客户端断掉的时候触发此事件

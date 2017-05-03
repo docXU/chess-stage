@@ -14,9 +14,14 @@ namespace ChessMiddle
     /// </summary>
     public class SocketClient : TcpFTxBase, ITxClient
     {
+        private char _player;
+        /// <summary>
+        /// 服务器分配的玩家角色
+        /// </summary>
+        public char Player { get => _player; set => _player = value; }
+
         #region 基本属性区块
         private TcpState stateOne = null;
-        private Thread StartThread = null;
         private int _reconnectMax = 5;//当连接断开时是否重连,0为不重连,默认重连三次;
         private int _outTime = 10;//登录超时时间
         private bool outTimeBool = false;//超时用到的临时变量
@@ -46,6 +51,7 @@ namespace ChessMiddle
             get { return _outTime; }
             set { _outTime = value; }
         }
+
         /// <summary>
         /// 带参数的构造函数
         /// </summary>
@@ -63,7 +69,7 @@ namespace ChessMiddle
         {
             if (_engineStart)
                 return;
-            StartThread = new Thread(start);
+            Thread StartThread = new Thread(start);
             StartThread.IsBackground = true;
             StartThread.Start();
         }

@@ -1,6 +1,7 @@
 ﻿using ChessMiddle;
 using ChessMiddle.PublicClass;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Net;
 using System.Windows.Forms;
@@ -88,8 +89,36 @@ namespace SocketClient
             TxClient.sendMessage(closeapi);
         }
         #endregion
+
         public Client()
-        { InitializeComponent(); }
+        {
+            InitializeComponent();
+            this.FormClosing += Client_FormClosing;
+        }
+
+        private void Client_FormClosing(object sender, FormClosingEventArgs e)
+        { 
+            if( TxClient == null)
+                return;
+            byte[] closeapi = API.getCloseAPI("");
+            TxClient.sendMessage(closeapi);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            List<string> action = new List<string>();
+            //action.Add("m/5,6-6,8/a");
+            //action.Add("aasdasdasd");
+            string actionString = textBox4.Text;
+            action.Add(actionString);
+
+            TxClient.sendMessage(API.getActionAPI(action, "x"));
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }
