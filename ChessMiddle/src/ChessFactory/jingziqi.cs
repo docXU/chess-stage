@@ -51,8 +51,9 @@ namespace ChessMiddle.ChessFactory
         public int Width { get => _width; }
         public int Height { get => _height; }
         public char[] Role { get => _role; }
-        public char[] Chess { get => _chess; }
+        public char[,] ChessLayout { get => _chess2d; }
         public string Size { get => "" + Width + "-" + Height; }
+
 
         /// <summary>
         /// 井子棋下子,并返回合法性

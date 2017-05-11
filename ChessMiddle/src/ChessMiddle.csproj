@@ -56,6 +56,7 @@
     <Compile Include="ChessFactory\Checkers.cs" />
     <Compile Include="ChessFactory\IChess.cs" />
     <Compile Include="ChessFactory\jingziqi.cs" />
+    <Compile Include="ChessFactory\xytq.cs" />
     <Compile Include="PublicClass\API.cs" />
     <Compile Include="PublicTool\jsonAndDictionary.cs" />
     <Compile Include="PublicTool\ReceiveDateOne.cs" />

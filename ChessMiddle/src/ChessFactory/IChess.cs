@@ -23,7 +23,7 @@ namespace ChessMiddle.ChessFactory
         /// <summary>
         /// 棋的实例
         /// </summary>
-        char[] Chess { get; }
+        char[,] ChessLayout { get; }
         /// <summary>
         /// 棋盘型号
         /// </summary>
