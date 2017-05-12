@@ -30,6 +30,19 @@ namespace ChessMiddle.ChessFactory
         string Size { get; }
 
         /// <summary>
+        /// 棋盘中的空位置
+        /// </summary>
+        char EMPTY { get; }
+        /// <summary>
+        /// 棋局还没结束.
+        /// </summary>
+        char NOT_DONE { get; }
+        /// <summary>
+        /// 平局
+        /// </summary>
+        char DRAW { get; }
+
+        /// <summary>
         /// 走棋
         /// </summary>
         /// <param name="actionMove">走棋序列</param>

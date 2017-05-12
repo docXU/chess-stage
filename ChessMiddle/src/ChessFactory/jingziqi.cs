@@ -5,9 +5,12 @@ using System.Text;
 
 namespace ChessMiddle.ChessFactory
 {
-    class jingziqi : IChess
+    public class Jingziqi : IChess
     {
-        private char NOTHING = '-';
+        /// <summary>
+        /// 棋盘中的空位置
+        /// </summary>
+        public char EMPTY { get => '-'; }
         /// <summary>
         /// 棋局还没结束.
         /// </summary>
@@ -22,7 +25,7 @@ namespace ChessMiddle.ChessFactory
         private int _width;
         private int _height;
         private char[] _role;
-        public jingziqi(int width, int height)
+        public Jingziqi(int width, int height)
         {
             _role = new char[] { 'x', 'o' };
             _chess = new char[width * height];
@@ -38,13 +41,13 @@ namespace ChessMiddle.ChessFactory
             int size = Width * Height;
             for (int i = 0; i < size; i++)
             {
-                _chess[i] = NOTHING;
+                _chess[i] = EMPTY;
             }
 
             for (int i = 0; i < _width; i++)
                 for (int j = 0; j < _height; j++)
                 {
-                    _chess2d[i, j] = NOTHING;
+                    _chess2d[i, j] = EMPTY;
                 }
         }
 
@@ -69,13 +72,13 @@ namespace ChessMiddle.ChessFactory
             int y = int.Parse(position.Split(',')[1]);
             if (x <= 0 || x > Width || y <= 0 || y > Height)
                 return false;
-            if (role == NOTHING || Array.IndexOf(Role, role) == -1)
+            if (role == EMPTY || Array.IndexOf(Role, role) == -1)
                 return false;
 
             int arrayPosition = (x - 1) * Width + y - 1;
 
             //那个位置为空
-            if (_chess[arrayPosition] == NOTHING)
+            if (_chess[arrayPosition] == EMPTY)
             {
                 _chess[arrayPosition] = role;
                 _chess2d[x - 1, y - 1] = role;
@@ -101,7 +104,7 @@ namespace ChessMiddle.ChessFactory
                     if (_chess2d[j, i] != _chess2d[j + 1, i])
                         isVertical = false;
                 }
-                if (_chess2d[i, 0] != NOTHING && isVertical == true)
+                if (_chess2d[i, 0] != EMPTY && isVertical == true)
                     return _chess2d[0, i];
             }
 
@@ -115,7 +118,7 @@ namespace ChessMiddle.ChessFactory
                     if (_chess2d[i, j] != _chess2d[i, j + 1])
                         isHorizontal = false;
                 }
-                if (_chess2d[i, 0] != NOTHING && isHorizontal == true)
+                if (_chess2d[i, 0] != EMPTY && isHorizontal == true)
                     return _chess2d[i, 0];
             }
 
@@ -127,7 +130,7 @@ namespace ChessMiddle.ChessFactory
                 if (_chess2d[i, i] != _chess2d[i + 1, i + 1])
                     isSlash = false;
             }
-            if (_chess2d[0, 0] != NOTHING && isSlash == true)
+            if (_chess2d[0, 0] != EMPTY && isSlash == true)
                 return _chess2d[0, 0];
 
             isSlash = true;
@@ -136,14 +139,14 @@ namespace ChessMiddle.ChessFactory
                 if (_chess2d[i, Width - i - 1] != _chess2d[i - 1, Width - i])
                     isSlash = false;
             }
-            if (_chess2d[0, _width - 1] != NOTHING && isSlash == true)
+            if (_chess2d[0, _width - 1] != EMPTY && isSlash == true)
                 return _chess2d[0, _width - 1];
 
 
             int size = Width * Height;
             for (int i = 0; i < size; i++)
             {
-                if (_chess[i] == NOTHING)
+                if (_chess[i] == EMPTY)
                     return NOT_DONE;
             }
 
@@ -163,7 +166,7 @@ namespace ChessMiddle.ChessFactory
                 int j;
                 for (j = 0; j < _height; j++)
                 {
-                    if (_chess2d[i, j] == NOTHING)
+                    if (_chess2d[i, j] == EMPTY)
                     {
                         //example
                         //在(1,2)的位置加一个x
