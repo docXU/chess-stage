@@ -12,6 +12,7 @@ namespace ChessMiddle.PublicClass
         private bool _connectOk = false;//是否真正与对方相连接;主要用与服务器中的对象;
         private DateTime _lastCallTime = DateTime.Now;
         private bool _thinkInTime = false;
+
         /// <summary>
         /// 二个作用，客户端真正关闭了引擎；服务器:是否真正与对方相连接;主要用与服务器中的对象;
         /// </summary>
@@ -20,10 +21,12 @@ namespace ChessMiddle.PublicClass
             get { return _connectOk; }
             set { _connectOk = value; }
         }
+
         /// <summary>
         /// 最后一次轮到下棋的指令发出的时间
         /// </summary>
         public DateTime LastCallTime { get => _lastCallTime; set => _lastCallTime = value; }
+
         /// <summary>
         /// 是否在限制的事件内返回棋步
         /// </summary>

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 
 namespace ChessMiddle.ChessFactory
 {
-    public class Xytq : IChess
+    class Xytq : IChess
     {
 
         public char EMPTY { get => '0'; }
@@ -84,16 +87,26 @@ namespace ChessMiddle.ChessFactory
             throw new NotImplementedException();
         }
 
-        public List<char[,]> NextLayout(char player, char[,] layout)
+
+        /// <summary>
+        /// 返回棋局的下一个可行解.包含解的解的步骤和棋局
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="layout"></param>
+        /// <returns></returns>
+        public Dictionary<List<string>, char[,]> NextLayout(char player, char[,] layout)
         {
 
             //add all possible position
-            List<char[,]> layoutList = new List<char[,]>();
-            layoutList.Add(layout);
+            Dictionary<List<string>, char[,]> layoutList = new Dictionary<List<string>, char[,]>();
+            List<string> nullList = new List<string>();
+            nullList.Add("");
+            layoutList.Add(nullList, layout);
             //add all empty position
-            List<char[,]> emptyList = new List<char[,]>();
+            Dictionary<List<string>, char[,]> emptyList = new Dictionary<List<string>, char[,]>();
             //add all rival position
-            List<char[,]> rivalList = new List<char[,]>();
+            Dictionary<List<string>, char[,]> rivalList = new Dictionary<List<string>, char[,]>();
+
 
             char rival = WHITE;
             int nextLine = -1;
@@ -118,6 +131,7 @@ namespace ChessMiddle.ChessFactory
                         {
                             player = playerKing;
                         }
+
                         //left positon
                         if (i + nextLine < _width && i + nextLine >= 0 && j - 1 >= 0)
                         {
@@ -130,8 +144,12 @@ namespace ChessMiddle.ChessFactory
 
                                 t[i + nextLine, j - 1] = player;
                                 t[i, j] = EMPTY;
+
+                                List<string> actionMove = new List<string>();
+                                actionMove.Add("" + i + "," + j + "-" + (i + nextLine) + "," + (j - 1));
                                 //add to list
-                                emptyList.Add(t);
+                                emptyList.Add(actionMove, t);
+
                             }
                             if (layout[i + nextLine, j - 1] == rival || layout[i + nextLine, j - 1] == rivalKing)
                             {
@@ -147,7 +165,10 @@ namespace ChessMiddle.ChessFactory
                                         t[i + nextLine, j - 1] = EMPTY;
                                         t[i, j] = EMPTY;
 
-                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, rivalList);
+                                        List<string> actionMove = new List<string>();
+                                        actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j - 2));
+
+                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, rivalList, actionMove);
                                         //rivalList.add(t);
                                     }
                                 }
@@ -167,7 +188,12 @@ namespace ChessMiddle.ChessFactory
                                 t[i + nextLine, j + 1] = player;
                                 t[i, j] = EMPTY;
                                 //add to list
-                                emptyList.Add(t);
+
+                                List<string> actionMove = new List<string>();
+                                actionMove.Add("" + i + "," + j + "-" + (i + nextLine) + "," + (j + 1));
+                                //add to list
+                                emptyList.Add(actionMove, t);
+
                             }
                             if (layout[i + nextLine, j + 1] == rival || layout[i + nextLine, j + 1] == rivalKing)
                             {
@@ -183,8 +209,12 @@ namespace ChessMiddle.ChessFactory
                                         t[i + nextLine, j + 1] = EMPTY;
                                         t[i, j] = EMPTY;
 
-                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, rivalList);
+                                        List<string> actionMove = new List<string>();
+                                        actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j + 2));
+
+                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, rivalList, actionMove);
                                         //rivalList.add(t);
+
                                     }
                                 }
                             }
@@ -205,15 +235,17 @@ namespace ChessMiddle.ChessFactory
 
                                 t[i - nextLine, j - 1] = player;
                                 t[i, j] = EMPTY;
+
+                                List<string> actionMove = new List<string>();
+                                actionMove.Add("" + i + "," + j + "-" + (i - nextLine) + "," + (j - 1));
                                 //add to list
-                                emptyList.Add(t);
+                                emptyList.Add(actionMove, t);
                             }
                             if (layout[i - nextLine, j - 1] == rival || layout[i - nextLine, j - 1] == rivalKing)
                             {
                                 if (i - 2 * nextLine < LENGTH && i - 2 * nextLine >= 0 && j - 2 >= 0)
                                 {
                                     if (layout[i - 2 * nextLine, j - 2] == EMPTY)
-
                                     {
                                         char[,] t = new char[LENGTH, LENGTH];
 
@@ -222,8 +254,12 @@ namespace ChessMiddle.ChessFactory
                                         t[i - nextLine, j - 1] = EMPTY;
                                         t[i, j] = EMPTY;
 
-                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, rivalList);
+                                        List<string> actionMove = new List<string>();
+                                        actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j - 2));
+
+                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, rivalList, actionMove);
                                         //rivalList.add(t);
+
                                     }
                                 }
                             }
@@ -241,8 +277,12 @@ namespace ChessMiddle.ChessFactory
 
                                 t[i - nextLine, j + 1] = player;
                                 t[i, j] = EMPTY;
+
+                                List<string> actionMove = new List<string>();
+                                actionMove.Add("" + i + "," + j + "-" + (i - nextLine) + "," + (j + 1));
                                 //add to list
-                                emptyList.Add(t);
+                                emptyList.Add(actionMove, t);
+
                             }
                             if (layout[i - nextLine, j + 1] == rival || layout[i - nextLine, j + 1] == rivalKing)
                             {
@@ -258,7 +298,10 @@ namespace ChessMiddle.ChessFactory
                                         t[i - nextLine, j + 1] = EMPTY;
                                         t[i, j] = EMPTY;
 
-                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, rivalList);
+                                        List<string> actionMove = new List<string>();
+                                        actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j + 2));
+
+                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, rivalList, actionMove);
                                         //rivalList.add(t);
                                     }
                                 }
@@ -271,17 +314,23 @@ namespace ChessMiddle.ChessFactory
             //not exist compulsory layout
             if (rivalList.Count == 0)
             {
-                layoutList.AddRange(emptyList);
+                foreach (List<string> am in emptyList.Keys)
+                {
+                    layoutList.Add(am, emptyList[am]);
+                }
             }
             else
             {
-                layoutList.AddRange(rivalList);
+                foreach (List<string> am in rivalList.Keys)
+                {
+                    layoutList.Add(am, rivalList[am]);
+                }
             }
 
             return layoutList;
         }
 
-        public void continueJump(char[,] layout, int x, int y, char player, int rival, List<char[,]> a)
+        public void continueJump(char[,] layout, int x, int y, char player, int rival, Dictionary<List<string>, char[,]> a, List<string> actionMove)
         {
             int flag = 0;
             int LENGTH = _width;
@@ -297,7 +346,9 @@ namespace ChessMiddle.ChessFactory
                     t[x - 1, y - 1] = EMPTY;
                     t[x, y] = EMPTY;
 
-                    continueJump(t, x - 2, y - 2, player, rival, a);
+                    List<string> newActionMove = Clone<string>(actionMove);
+                    newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y - 2));
+                    continueJump(t, x - 2, y - 2, player, rival, a, newActionMove);
                     //a.add(t);
                 }
                 if (x - 2 >= 0 && y + 2 < LENGTH && layout[x - 1, y + 1] == rival && layout[x - 2, y + 2] == EMPTY)
@@ -310,7 +361,9 @@ namespace ChessMiddle.ChessFactory
                     t[x - 1, y + 1] = EMPTY;
                     t[x, y] = EMPTY;
 
-                    continueJump(t, x - 2, y + 2, player, rival, a);
+                    List<string> newActionMove = Clone<string>(actionMove);
+                    newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y + 2));
+                    continueJump(t, x - 2, y + 2, player, rival, a, newActionMove);
                     //a.add(t);
                 }
             }
@@ -326,7 +379,9 @@ namespace ChessMiddle.ChessFactory
                     t[x + 1, y - 1] = EMPTY;
                     t[x, y] = EMPTY;
 
-                    continueJump(t, x + 2, y + 2, player, rival, a);
+                    List<string> newActionMove = Clone<string>(actionMove);
+                    newActionMove.Add("" + x + "," + y + "--" + (x + 2) + "," + (y - 2));
+                    continueJump(t, x + 2, y + 2, player, rival, a, newActionMove);
                 }
                 if (x + 2 < LENGTH && y + 2 < LENGTH && layout[x + 1, y + 1] == rival && layout[x + 2, y + 2] == EMPTY)
                 {
@@ -338,13 +393,16 @@ namespace ChessMiddle.ChessFactory
                     t[x + 1, y + 1] = EMPTY;
                     t[x, y] = EMPTY;
 
-                    continueJump(t, x + 2, y + 2, player, rival, a);
+                    List<string> newActionMove = Clone<string>(actionMove);
+                    newActionMove.Add("" + x + "," + y + "--" + (x + 2) + "," + (y + 2));
+                    continueJump(t, x + 2, y + 2, player, rival, a, newActionMove);
                 }
+
             }
 
             if (0 == flag)
             {
-                a.Add(layout);
+                a.Add(actionMove, layout);
             }
             return;
         }
@@ -361,7 +419,24 @@ namespace ChessMiddle.ChessFactory
             }
         }
 
-        public void print(char[,] layout)
+        /// <summary>
+        /// Clones the specified list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="List">The list.</param>
+        /// <returns>List{``0}.</returns>
+        public static List<T> Clone<T>(object List)
+        {
+            using (Stream objectStream = new MemoryStream())
+            {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(objectStream, List);
+                objectStream.Seek(0, SeekOrigin.Begin);
+                return formatter.Deserialize(objectStream) as List<T>;
+            }
+        }
+
+        public void print(char[,] layout, List<string> am)
         {
             int LENGTH = _width;
             for (int i = 0; i < LENGTH; i++)
@@ -369,36 +444,37 @@ namespace ChessMiddle.ChessFactory
                 Console.Write("|");
                 for (int j = 0; j < LENGTH; j++)
                 {
-                    if (layout[i,j] == EMPTY)
+                    if (layout[i, j] == EMPTY)
                     {
                         Console.Write(" " + "|");
                     }
-                    if (layout[i,j] == WHITE)
+                    if (layout[i, j] == WHITE)
                     {
-                        Console.Write("o" + "|");
+                        Console.Write("a" + "|");
                     }
-                    if (layout[i,j] == WHITE_KING)
+                    if (layout[i, j] == WHITE_KING)
                     {
-                        Console.Write("@" + "|");
+                        Console.Write("A" + "|");
                     }
-                    if (layout[i,j] == BLACK)
+                    if (layout[i, j] == BLACK)
                     {
-                        Console.Write("*" + "|");
+                        Console.Write("b" + "|");
                     }
-                    if (layout[i,j] == BLACK_KING)
+                    if (layout[i, j] == BLACK_KING)
                     {
-                        Console.Write("&" + "|");
+                        Console.Write("B" + "|");
                     }
                 }
                 Console.WriteLine();
-                Console.WriteLine("----------------------");
-
+                Console.WriteLine("-----------------");
             }
+            foreach (string a in am)
+                Console.WriteLine(a);
+
             Console.WriteLine();
             Console.WriteLine("----------this is line------------");
             Console.WriteLine();
         }
-
 
     }
 }

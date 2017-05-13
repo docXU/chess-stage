@@ -13,7 +13,6 @@ namespace ChessMiddle.Basics
        private int _bufferSize = 1024;//缓冲区大小
        private byte[] _buffer = null;//缓冲区
        private byte[] _sendDate = null;//已发送的数据
-       private int _sendDateLabel = 0;//发送数据的标签
        private byte[] _bufferBackup = null;//备份缓冲区;主要是缓冲区有时候需要增大或缩小的时候用到；
         /// <summary>
        /// 备份缓冲区;主要是缓冲区有时候需要增大或缩小的时候用到；
@@ -69,24 +68,6 @@ namespace ChessMiddle.Basics
        {
            get { return _sendDate; }
            set { _sendDate = value; }
-       }
-        /// <summary>
-        /// 已发数据的标签
-        /// </summary>
-       internal int SendDateLabel
-       {
-           get { return _sendDateLabel; }
-           set { _sendDateLabel = value; }
-       }
-        /// <summary>
-        /// 同时设置发送数据和它的标签的方法
-        /// </summary>
-        /// <param name="Lable">标签</param>
-        /// <param name="sendDate">已发送数据</param>
-       internal void SendDateInitialization(int Lable,byte[] sendDate)
-       {
-           _sendDateLabel = Lable;
-           _sendDate = sendDate;
        }
        /// <summary>
        /// IPEndPoint得到客户端地址,端口号；
