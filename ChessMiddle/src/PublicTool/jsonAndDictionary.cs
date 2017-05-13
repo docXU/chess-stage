@@ -4,7 +4,7 @@ using System.Web.Script.Serialization;
 
 namespace ChessMiddle.PublicTool
 {
-    class jsonAndDictionary
+    public class jsonAndDictionary
     {
         /// <summary>  
         /// 将json数据反序列化为Dictionary  

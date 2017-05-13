@@ -319,7 +319,7 @@ namespace ChessMiddle
         /// <param name="role"></param>
         private void sendNextEpisode(StateBase state, string role)
         {
-            Send(state, API.getNextEpisodeAPI(_chess.Chess, _chess.Size, role, limitThinkSeconds));
+            Send(state, API.getNextEpisodeAPI(_chess.ChessLayout, _chess.Size, role, limitThinkSeconds));
 
             Thread thinkTimeoutThread = new Thread(ThinkTimeout);
             thinkTimeoutThread.IsBackground = true;

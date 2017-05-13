@@ -79,7 +79,7 @@ namespace ChessMiddle.PublicClass
         /// <param name="role">下一个选手的身份</param>
         /// <param name="limitTimeSecond">运算等待时间</param>
         /// <returns></returns>
-        public static byte[] getNextEpisodeAPI(char[] now, string size, string role, double limitTimeSecond)
+        public static byte[] getNextEpisodeAPI(char[,] now, string size, string role, double limitTimeSecond)
         {
             Dictionary<string, object> obj = new Dictionary<string, object>();
             obj.Add("type", "do_algorithm");
@@ -103,6 +103,17 @@ namespace ChessMiddle.PublicClass
             obj.Add("result", situation);
             Console.WriteLine("api:  " + jsonAndDictionary.DictionaryToJson(obj));
             return Encoding.Default.GetBytes(jsonAndDictionary.DictionaryToJson(obj));
+        }
+
+
+        public static void UnitTest()
+        {
+            char[,] a = new char[3, 5] {
+                {'g','s','d','s','a' },
+                {'g','s','d','s','a' },
+                {'g','s','d','s','a' }
+            };
+            getNextEpisodeAPI(a, "s+5", "a", 5f);
         }
     }
 }
