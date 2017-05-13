@@ -32,7 +32,7 @@ namespace ChessMiddle
         //棋局监控属性
         private Dictionary<char, StateBase> roleTable = new Dictionary<char, StateBase>();//角色分配表
         private TcpState currentToken = null;//当前走棋位
-        private double limitThinkSeconds = 5;
+        private double limitThinkSeconds = 2;
 
         #region 基本属性区块
         private List<TcpState> state = null;//所有客户端
@@ -50,7 +50,7 @@ namespace ChessMiddle
         /// <summary>
         /// 在UI上下棋
         /// </summary>
-        public event TxDelegate<List<string>,char, char> PlayChess;
+        public event TxDelegate<List<string>,char[,], char, char> PlayChess;
         /// <summary>
         /// 当前客户端数量
         /// </summary>
@@ -232,7 +232,7 @@ namespace ChessMiddle
 
                         char result = _chess.GetResult();
                         //todo 将行动的棋显示在UI上
-                        OnChessPlay(changes, role, result);
+                        OnChessPlay(changes, _chess.publicLayoutAndChanges[changes], role, result);
                         sendResult(result);
 
                         if (result == _chess.NOT_DONE)
@@ -353,7 +353,8 @@ namespace ChessMiddle
                     char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
                     List<string> changes = _chess.DefaultDo(role);
                     char result = _chess.GetResult();
-                    OnChessPlay(changes, role, result);
+
+                    OnChessPlay(changes, _chess.publicLayoutAndChanges[changes], role, result);
                     sendResult(result);
                     if (result == _chess.NOT_DONE)
                         refreshAndNext(stateOne);
@@ -421,14 +422,24 @@ namespace ChessMiddle
         #region 针对表现层需要操作的一些方法
 
         /// <summary>
+        /// 获得棋局
+        /// </summary>
+        /// <returns></returns>
+        public char[,] getChessLayout()
+        {
+            return _chess.ChessLayout;
+        }
+
+        /// <summary>
         /// 下棋
         /// </summary>
         /// <param name="data">关键数据</param>
+        /// <param name="layout">得到棋局</param>
         /// <param name="role">玩家身份</param>
         /// <param name="result">棋步下完后的结果</param>
-        public void OnChessPlay(List<string> data, char role, char result)
+        public void OnChessPlay(List<string> data, char[,] layout, char role, char result)
         {
-            CommonMethod.eventInvoket(() => { PlayChess(data, role, result); });
+            CommonMethod.eventInvoket(() => { PlayChess(data, layout, role, result); });
         }
 
         /// <summary>
@@ -502,7 +513,11 @@ namespace ChessMiddle
             if (stateOne == null)
                 return;
             stateOne.WorkSocket.Close();
-            roleTable.Remove((char)CommonMethod.getKeyByValue(roleTable, stateOne)[0]);
+
+            List<object> findGamer = CommonMethod.getKeyByValue(roleTable, stateOne);
+            if (findGamer.Count != 0) 
+                roleTable.Remove((char)findGamer[0]);
+
             if (state.Remove(stateOne))//当没有登录的时候断掉，不触发下面的事件
             {
                 CommonMethod.eventInvoket(() => { Disconnection(stateOne.IpEndPoint, str); }); //当客户端断掉的时候触发此事件

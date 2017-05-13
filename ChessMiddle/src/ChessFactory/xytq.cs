@@ -11,6 +11,19 @@ namespace ChessMiddle.ChessFactory
 {
     class Xytq : IChess
     {
+        //add all possible position
+        private Dictionary<List<string>, char[,]> layoutList;
+        //public List<string> nullList = new List<string>();
+        //add all empty position
+        private Dictionary<List<string>, char[,]> emptyList;
+        //add all rival position
+        private Dictionary<List<string>, char[,]> rivalList;
+
+        /// <summary>
+        /// 对棋局做修改后会保留的一个关于修改序列和得到的棋局的键值对
+        /// </summary>
+        public Dictionary<List<string>, char[,]> publicLayoutAndChanges;
+
 
         public char EMPTY { get => '0'; }
         public char NOT_DONE { get => '~'; }
@@ -43,6 +56,10 @@ namespace ChessMiddle.ChessFactory
             WHITE_KING = 'A';
 
             init();
+            layoutList = new Dictionary<List<string>, char[,]>();
+            rivalList = new Dictionary<List<string>, char[,]>();
+            emptyList = new Dictionary<List<string>, char[,]>();
+            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>();
         }
 
         public Xytq(char[,] layout)
@@ -56,6 +73,10 @@ namespace ChessMiddle.ChessFactory
             WHITE_KING = 'A';
 
             _chessLayout = layout;
+            layoutList = new Dictionary<List<string>, char[,]>();
+            rivalList = new Dictionary<List<string>, char[,]>();
+            emptyList = new Dictionary<List<string>, char[,]>();
+            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>();
         }
 
         private void init()
@@ -74,21 +95,53 @@ namespace ChessMiddle.ChessFactory
 
         public List<string> DefaultDo(char role)
         {
-            Dictionary<List<string>, char[,]> Next = NextLayout(role, _chessLayout);
-            int moveableCount = Next.Keys.Count;
+            Dictionary<List<string>, char[,]> Nexts = NextLayout(role, _chessLayout);
+            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>(Nexts);
+
+            int moveableCount = Nexts.Keys.Count;
+            List<string>[] forRandom = new List<string>[Nexts.Keys.Count];
+            Nexts.Keys.CopyTo(forRandom, 0);
 
             int randomI = new Random().Next(0, moveableCount);
-            return Next.ElementAt(randomI).Key;
+
+            _chessLayout = Nexts[forRandom[randomI]];
+            //变王
+            for (int i = 0; i < _width; i++)
+            {
+                if (_chessLayout[0, i] == BLACK)
+                {
+                    _chessLayout[0, i] = BLACK_KING;
+                }
+
+                if (_chessLayout[_height - 1, i] == WHITE)
+                    _chessLayout[_height - 1, i] = WHITE_KING;
+            }
+
+            return forRandom[randomI];
         }
 
         public bool DoChess(List<string> actionMove, char role)
         {
-            Dictionary<List<string>, char[,]> next = NextLayout(role, _chessLayout);
-            foreach (List<string> ableMove in next.Keys)
+            Dictionary<List<string>, char[,]> Next = NextLayout(role, _chessLayout);
+            foreach (List<string> ableMove in Next.Keys)
             {
                 if (actionMove.Equals(ableMove))
-                {   
-                    _chessLayout = next[ableMove];
+                {
+                    publicLayoutAndChanges = new Dictionary<List<string>, char[,]>(Next);
+                    _chessLayout = Next[ableMove];
+          
+                    //变王
+                    for (int i = 0; i < _width; i++)
+                    {
+                        if (_chessLayout[0, i] == BLACK)
+                        {
+                            _chessLayout[0, i] = BLACK_KING;
+                        }
+
+                        if (_chessLayout[_height - 1, i] == WHITE)
+                            _chessLayout[_height - 1, i] = WHITE_KING;
+                    }
+
                     return true;
                 }
             }
@@ -127,17 +180,9 @@ namespace ChessMiddle.ChessFactory
         /// <returns></returns>
         public Dictionary<List<string>, char[,]> NextLayout(char player, char[,] layout)
         {
-
-            //add all possible position
-            Dictionary<List<string>, char[,]> layoutList = new Dictionary<List<string>, char[,]>();
-            List<string> nullList = new List<string>();
-            nullList.Add("");
-            layoutList.Add(nullList, layout);
-            //add all empty position
-            Dictionary<List<string>, char[,]> emptyList = new Dictionary<List<string>, char[,]>();
-            //add all rival position
-            Dictionary<List<string>, char[,]> rivalList = new Dictionary<List<string>, char[,]>();
-
+            layoutList.Clear();
+            rivalList.Clear();
+            emptyList.Clear();
 
             char rival = WHITE;
             int nextLine = -1;

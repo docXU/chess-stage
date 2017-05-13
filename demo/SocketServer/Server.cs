@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 namespace SocketServer
 {
@@ -59,7 +60,17 @@ namespace SocketServer
         private void disconnection(IPEndPoint ipEndPoint, string str)
         {
             show(ipEndPoint, "下线");
-            chessInit();
+            chessInit(new char[8, 8]
+                {
+                    {'0',  'a', '0',  'a',  '0',  'a',  '0',  'a' },
+                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  'a', '0',  '0',  'a',  '0',  'a',  '0' },
+                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  '0',  'a',  '0',  '0',  '0' },
+                    {'0',  '0', '0',  'B',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  'b',  'a',  '0',  '0',  '0' },
+                    {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
+                });
         }
         /// <summary>
         /// 当服务器完全关闭的时候
@@ -96,23 +107,77 @@ namespace SocketServer
                 server.Disconnection += new TxDelegate<IPEndPoint, string>(disconnection);
                 server.EngineClose += new TxDelegate(engineClose);
                 server.EngineLost += new TxDelegate<string>(engineLost);
-                server.PlayChess += new TxDelegate<List<string>, char, char>(playChess);
+                server.PlayChess += new TxDelegate<List<string>, char[,], char, char>(playChess);
                 server.StartEngine();
                 this.button1.Enabled = false;
+                char[,] layout = new char[8, 8]
+                {
+                    {'0',  'a', '0',  'a',  '0',  'a',  '0',  'a' },
+                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  'a', '0',  '0',  'a',  '0',  'a',  '0' },
+                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  '0',  'a',  '0',  '0',  '0' },
+                    {'0',  '0', '0',  'B',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  'b',  'a',  '0',  '0',  '0' },
+                    {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
+                };
+                chessInit(((ChessMiddle.SocketServer)server).getChessLayout());
             }
             catch (Exception Ex) { MessageBox.Show(Ex.Message); }
 
         }
 
-        private void playChess(List<string> actionMove,char role, char result)
+        private void playChess(List<string> actionMove, char[,] layout, char role, char result)
         {
+            bool eatSome = false;
             foreach (string i in actionMove)
             {
-                int x = int.Parse(i.Split(',')[0]);
-                int y = int.Parse(i.Split(',')[1]);
-                chess[x - 1, y - 1] = role;
+                Console.WriteLine(i);
+                eatSome = false;
+                string[] typeEat = Regex.Split(i, "--");
+
+                if (typeEat.Length == 2)
+                {
+                    eatSome = true;
+                }
+
+                string oldPos;
+                string newPos;
+                if (eatSome)
+                {
+                    oldPos = typeEat[0];
+                    newPos = typeEat[1];
+                    Console.WriteLine("eat: " + i);
+                }
+                else
+                {
+                    string[] typePush = Regex.Split(i, "-");
+                    for (int j = 0; j < typePush.Length; j++)
+                        Console.WriteLine("just push: " + typePush[j]);
+                    oldPos = typePush[0];
+                    newPos = typePush[1];
+
+                }
+
+                int x_old = int.Parse(oldPos.Split(',')[0]);
+                int y_old = int.Parse(oldPos.Split(',')[1]);
+                int x_new = int.Parse(newPos.Split(',')[0]);
+                int y_new = int.Parse(newPos.Split(',')[1]);
+
+                if (eatSome)
+                {
+                    chess[x_old, y_old] = '0';
+                    chess[(x_old + x_new) / 2, (y_old + y_new) / 2] = '0';
+                    chess[x_new, y_new] = role;
+                }
+                else
+                {
+                    chess[x_old, y_old] = '0';
+                    chess[x_new, y_new] = role;
+                }
+
             }
-            convertToUI(chess, result);
+            convertToUI(layout, result);
         }
 
         /// <summary>
@@ -130,38 +195,54 @@ namespace SocketServer
         public Server()
         {
             InitializeComponent();
-            chessInit();
 
         }
 
-        private void chessInit()
+        private void chessInit(char[,] chessLayout)
         {
-            chess = new char[3, 3];
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    chess[i, j] = ' ';
-                }
-            }
+            chess = chessLayout;
             convertToUI(chess, '~');
         }
 
-        private void convertToUI(char[,] chess, char result)
+        private void convertToUI(char[,] layout, char result)
         {
             string UI = "";
-            for (int i = 0; i < 3; i++)
+            int LENGTH = 8;
+            char EMPTY = '0';
+            char WHITE = 'a';
+            char WHITE_KING = 'A';
+            char BLACK = 'b';
+            char BLACK_KING = 'B';
+            for (int i = 0; i < LENGTH; i++)
             {
-                for (int j = 0; j < 3; j++)
+                UI += ("|");
+                for (int j = 0; j < LENGTH; j++)
                 {
-                    if (j < 2)
-                        UI += chess[i, j].ToString() + "|";
-                    else
-                        UI += chess[i, j];
+                    if (layout[i, j] == EMPTY)
+                    {
+                        UI += (" " + "|");
+                    }
+                    if (layout[i, j] == WHITE)
+                    {
+                        UI += ("a" + "|");
+                    }
+                    if (layout[i, j] == WHITE_KING)
+                    {
+                        UI += ("A" + "|");
+                    }
+                    if (layout[i, j] == BLACK)
+                    {
+                        UI += ("b" + "|");
+                    }
+                    if (layout[i, j] == BLACK_KING)
+                    {
+                        UI += ("B" + "|");
+                    }
                 }
                 UI += "\r\n";
+                UI += ("-----------------\r\n");
             }
-            this.textBox1.Text = UI + "\r\n 局势:"+result;
+            this.textBox1.Text = UI + "\r\n 局势:" + result;
         }
     }
 }

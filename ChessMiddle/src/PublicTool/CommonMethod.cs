@@ -79,5 +79,42 @@ namespace ChessMiddle.PublicTool
             }
             return index;
         }
+
+
+        
+        /// <summary>
+        /// 根据一个值与字典键的值相等但引用地址不相等的键,查找对应的键值对的值.
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="outkey"></param>
+        /// <returns></returns>
+        internal static char[,] findValueByOutKey(Dictionary<List<string>, char[,]> dic, List<string> outkey)
+        {
+            bool isTheKey = true;
+            //Console.WriteLine(dic.Count);
+            foreach(List<string> key in dic.Keys)
+            {
+                isTheKey = true;
+                if(key.Count == outkey.Count)
+                {
+                    int len = key.Count;
+                    for(int i =0;i<len;i++)
+                    {
+                        if ( outkey[i] != key[i] )
+                        {
+                            isTheKey = false;
+                            break;
+                        }
+                    }
+                }
+                if(isTheKey)
+                {
+                    return dic[key];
+                }
+            }
+
+            //这句代码可能永远跑不到
+            return dic[outkey];
+        }
     }
 }
