@@ -74,17 +74,48 @@ namespace ChessMiddle.ChessFactory
 
         public List<string> DefaultDo(char role)
         {
-            throw new NotImplementedException();
+            Dictionary<List<string>, char[,]> Next = NextLayout(role, _chessLayout);
+            int moveableCount = Next.Keys.Count;
+
+            int randomI = new Random().Next(0, moveableCount);
+            return Next.ElementAt(randomI).Key;
         }
 
         public bool DoChess(List<string> actionMove, char role)
         {
-            throw new NotImplementedException();
+            Dictionary<List<string>, char[,]> next = NextLayout(role, _chessLayout);
+            foreach (List<string> ableMove in next.Keys)
+            {
+                if (actionMove.Equals(ableMove))
+                {   
+                    _chessLayout = next[ableMove];
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public char GetResult()
         {
-            throw new NotImplementedException();
+            Dictionary<List<string>, char[,]> RoleFirstNext = NextLayout(Role[0], _chessLayout);
+            if(RoleFirstNext.Keys.Count == 0)
+            {
+                return Role[1];
+            }
+
+            Dictionary<List<string>, char[,]> RoleSecondNext = NextLayout(Role[1], _chessLayout);
+            if (RoleSecondNext.Keys.Count == 0)
+            {
+                return Role[0];
+            }
+
+            if(RoleFirstNext.Keys.Count!=0 && RoleSecondNext.Keys.Count != 0)
+            {
+                return NOT_DONE;
+            }
+
+            return DRAW;
         }
 
 

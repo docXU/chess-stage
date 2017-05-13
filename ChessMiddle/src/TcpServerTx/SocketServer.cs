@@ -28,7 +28,7 @@ namespace ChessMiddle
                 state = new List<TcpState>();
         }
 
-        private Jingziqi _chess;
+        private Xytq _chess;
         //棋局监控属性
         private Dictionary<char, StateBase> roleTable = new Dictionary<char, StateBase>();//角色分配表
         private TcpState currentToken = null;//当前走棋位
@@ -100,7 +100,7 @@ namespace ChessMiddle
             if (EngineStart)
                 return;
             //实例化一个镜字棋
-            _chess = new Jingziqi(3, 3);
+            _chess = new Xytq();
             _clientMax = _chess.Role.Length;
             try
             {
@@ -283,7 +283,7 @@ namespace ChessMiddle
 
         private void MatchFinish()
         {
-            _chess = new Jingziqi(3, 3);
+            _chess = new Xytq();
             _clientMax = _chess.Role.Length;
             TcpState[] temp =new TcpState[state.Count];
             state.CopyTo(temp);
