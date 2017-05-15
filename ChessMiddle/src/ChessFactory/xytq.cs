@@ -11,14 +11,6 @@ namespace ChessMiddle.ChessFactory
 {
     class Xytq : IChess
     {
-
-
-        /// <summary>
-        /// 对棋局做修改后会保留的一个关于修改序列和得到的棋局的键值对
-        /// </summary>
-        public Dictionary<List<string>, char[,]> publicLayoutAndChanges;
-
-
         public char EMPTY { get => '0'; }
         public char NOT_DONE { get => '~'; }
         public char DRAW { get => 'd'; }
@@ -83,6 +75,22 @@ namespace ChessMiddle.ChessFactory
         {
             Dictionary<List<string>, char[,]> Nexts = NextLayout(role, _chessLayout);
 
+            if (Nexts.Count < 1)
+            {
+                return null;
+            }
+
+            int o = 0;
+            foreach(List<string> l in Nexts.Keys)
+            {
+                o++;
+                Console.WriteLine("index of Keys:" + o);
+                foreach (string s in l)
+                {
+                    Console.WriteLine(s);
+                }
+            }
+
             int moveableCount = Nexts.Keys.Count;
             List<string>[] forRandom = new List<string>[Nexts.Keys.Count];
             Nexts.Keys.CopyTo(forRandom, 0);
@@ -110,7 +118,7 @@ namespace ChessMiddle.ChessFactory
             Dictionary<List<string>, char[,]> Next = NextLayout(role, _chessLayout);
             foreach (List<string> ableMove in Next.Keys)
             {
-                //验证集合如果有重复会导致验证失败,但这里不需考虑这点
+                //验证集合如果有重复会导致验证失败,但这里不需考虑这点(不可能出现重复走一条路)
                 if (actionMove.Count == ableMove.Count && actionMove.All(ableMove.Contains))
                 {
                     _chessLayout = Next[ableMove];
@@ -166,22 +174,29 @@ namespace ChessMiddle.ChessFactory
         public Dictionary<List<string>, char[,]> NextLayout(char player, char[,] layout)
         {
             //add all possible position
-            Dictionary<List<string>, char[,]> layoutList = new Dictionary<List<string>, char[,]>();
+            Dictionary<List<string>, char[,]> layoutDic = new Dictionary<List<string>, char[,]>();
             //add all empty position
-            Dictionary<List<string>, char[,]> emptyList = new Dictionary<List<string>, char[,]>();
+            Dictionary<List<string>, char[,]> emptyDic = new Dictionary<List<string>, char[,]>();
             //add all eat position
-            Dictionary<List<string>, char[,]> eatList = new Dictionary<List<string>, char[,]>();
+            Dictionary<List<string>, char[,]> eatDic = new Dictionary<List<string>, char[,]>();
 
-            char rival = WHITE;
-            int nextLine = -1;
-            char playerKing = BLACK_KING;
-            char rivalKing = WHITE_KING;
-            if (player == WHITE)
+            int nextLine;
+            char rival, playerKing, rivalKing;
+            if (player == WHITE || player == WHITE_KING)
             {
+                player = WHITE;
                 rival = BLACK;
                 nextLine = 1;
                 playerKing = WHITE_KING;
                 rivalKing = BLACK_KING;
+            }
+            else
+            {
+                player = BLACK;
+                rival = WHITE;
+                nextLine = -1;
+                playerKing = BLACK_KING;
+                rivalKing = WHITE_KING;
             }
 
             int LENGTH = _width;
@@ -191,11 +206,7 @@ namespace ChessMiddle.ChessFactory
                 {
                     if (layout[i, j] == player || layout[i, j] == playerKing)
                     {
-                        if (layout[i, j] == playerKing)
-                        {
-                            player = playerKing;
-                        }
-
+                        player = layout[i, j];
                         //left positon
                         if (i + nextLine < _width && i + nextLine >= 0 && j - 1 >= 0)
                         {
@@ -203,7 +214,6 @@ namespace ChessMiddle.ChessFactory
                             if (layout[i + nextLine, j - 1] == EMPTY)
                             {
                                 char[,] t = new char[LENGTH, LENGTH];
-
                                 deepClone(t, layout);
 
                                 t[i + nextLine, j - 1] = player;
@@ -212,8 +222,7 @@ namespace ChessMiddle.ChessFactory
                                 List<string> actionMove = new List<string>();
                                 actionMove.Add("" + i + "," + j + "-" + (i + nextLine) + "," + (j - 1));
                                 //add to list
-                                emptyList.Add(actionMove, t);
-
+                                emptyDic.Add(actionMove, t);
                             }
                             if (layout[i + nextLine, j - 1] == rival || layout[i + nextLine, j - 1] == rivalKing)
                             {
@@ -222,7 +231,6 @@ namespace ChessMiddle.ChessFactory
                                     if (layout[i + 2 * nextLine, j - 2] == EMPTY)
                                     {
                                         char[,] t = new char[LENGTH, LENGTH];
-
                                         deepClone(t, layout);
 
                                         t[i + 2 * nextLine, j - 2] = player;
@@ -232,8 +240,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j - 2));
 
-                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, eatList, actionMove);
-                                        //eatList.add(t);
+                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, eatDic, actionMove);
                                     }
                                 }
                             }
@@ -246,7 +253,6 @@ namespace ChessMiddle.ChessFactory
                             {
                                 //get next layout
                                 char[,] t = new char[LENGTH, LENGTH];
-
                                 deepClone(t, layout);
 
                                 t[i + nextLine, j + 1] = player;
@@ -256,7 +262,7 @@ namespace ChessMiddle.ChessFactory
                                 List<string> actionMove = new List<string>();
                                 actionMove.Add("" + i + "," + j + "-" + (i + nextLine) + "," + (j + 1));
                                 //add to list
-                                emptyList.Add(actionMove, t);
+                                emptyDic.Add(actionMove, t);
 
                             }
                             if (layout[i + nextLine, j + 1] == rival || layout[i + nextLine, j + 1] == rivalKing)
@@ -276,7 +282,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j + 2));
 
-                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, eatList, actionMove);
+                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, eatDic, actionMove);
                                     }
                                 }
                             }
@@ -285,6 +291,7 @@ namespace ChessMiddle.ChessFactory
 
                     if (layout[i, j] == playerKing)
                     {
+                        player = layout[i, j];
                         //left positon
                         if (i - nextLine < LENGTH && i - nextLine >= 0 && j - 1 >= 0)
                         {
@@ -301,7 +308,7 @@ namespace ChessMiddle.ChessFactory
                                 List<string> actionMove = new List<string>();
                                 actionMove.Add("" + i + "," + j + "-" + (i - nextLine) + "," + (j - 1));
                                 //add to list
-                                emptyList.Add(actionMove, t);
+                                emptyDic.Add(actionMove, t);
                             }
                             if (layout[i - nextLine, j - 1] == rival || layout[i - nextLine, j - 1] == rivalKing)
                             {
@@ -319,7 +326,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j - 2));
 
-                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, eatList, actionMove);
+                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, eatDic, actionMove);
                                     }
                                 }
                             }
@@ -341,7 +348,7 @@ namespace ChessMiddle.ChessFactory
                                 List<string> actionMove = new List<string>();
                                 actionMove.Add("" + i + "," + j + "-" + (i - nextLine) + "," + (j + 1));
                                 //add to list
-                                emptyList.Add(actionMove, t);
+                                emptyDic.Add(actionMove, t);
 
                             }
                             if (layout[i - nextLine, j + 1] == rival || layout[i - nextLine, j + 1] == rivalKing)
@@ -361,7 +368,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j + 2));
 
-                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, eatList, actionMove);
+                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, eatDic, actionMove);
                                     }
                                 }
                             }
@@ -370,23 +377,25 @@ namespace ChessMiddle.ChessFactory
                 }
             }
 
+            Console.WriteLine("playerKing = " + playerKing);
+            Console.WriteLine("eatDic count = " + eatDic.Count);
             //not exist compulsory layout
-            if (eatList.Count == 0)
+            if (eatDic.Count == 0)
             {
-                foreach (List<string> am in emptyList.Keys)
+                foreach (List<string> am in emptyDic.Keys)
                 {
-                    layoutList.Add(am, emptyList[am]);
+                    layoutDic.Add(am, emptyDic[am]);
                 }
             }
             else
             {
-                foreach (List<string> am in eatList.Keys)
+                foreach (List<string> am in eatDic.Keys)
                 {
-                    layoutList.Add(am, eatList[am]);
+                    layoutDic.Add(am, eatDic[am]);
                 }
             }
 
-            return layoutList;
+            return layoutDic;
         }
 
         public void continueJump(char[,] layout, int x, int y, char player, int rival, Dictionary<List<string>, char[,]> a, List<string> actionMove)

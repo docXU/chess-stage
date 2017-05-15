@@ -116,20 +116,9 @@ namespace SocketServer
                 server.EngineClose += new TxDelegate(engineClose);
                 server.EngineLost += new TxDelegate<string>(engineLost);
                 server.PlayChess += new TxDelegate<List<string>, char[,], char, char>(playChess);
-                server.LimitThinkSeconds = 1;
+                server.LimitThinkSeconds = 2;
                 server.StartEngine();
                 this.button1.Enabled = false;
-                char[,] layout = new char[8, 8]
-                {
-                    {'0',  'a', '0',  'a',  '0',  'a',  '0',  'a' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
-                    {'0',  'a', '0',  '0',  'a',  '0',  'a',  '0' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
-                    {'0',  '0', 'a',  '0',  'a',  '0',  '0',  '0' },
-                    {'0',  '0', '0',  'B',  '0',  '0',  '0',  '0' },
-                    {'0',  '0', 'a',  'b',  'a',  '0',  '0',  '0' },
-                    {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
-                };
                 chessInit(server.GetChessLayout());
             }
             catch (Exception Ex) { MessageBox.Show(Ex.Message); }
