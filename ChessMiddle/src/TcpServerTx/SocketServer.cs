@@ -89,6 +89,12 @@ namespace ChessMiddle
                 return IpEndPoint;
             }
         }
+
+        /// <summary>
+        /// 设置限时秒数
+        /// </summary>
+        public double LimitThinkSeconds { get => limitThinkSeconds; set => limitThinkSeconds = value; }
+
         #endregion
 
         #region 启动以及接收客户端区块
@@ -211,9 +217,11 @@ namespace ChessMiddle
                         //判断令牌对不对
                         if (!stateOne.IpEndPoint.Equals(currentToken.IpEndPoint))
                             return;
+                        //可用data里的role替换已再次验证数据来源
                         char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
                         List<string> changes = new List<string>();
-                        foreach (string i in ((ArrayList)data["changes"]))
+                        ArrayList changesSource = ((ArrayList)(data["changes"]));
+                        foreach (string i in changesSource)
                         {
                             changes.Add(i);
                         }
@@ -224,7 +232,7 @@ namespace ChessMiddle
                         {
                             Send(stateOne, API.getIllegalAPI("棋步违法!"));
                             //先强制中断
-                            socketRemove(stateOne, "违法棋");
+                            //socketRemove(stateOne, "违法棋");
                             break;
                         }
                         //多线程可同时读一个内存变量,而写要加锁
@@ -232,7 +240,7 @@ namespace ChessMiddle
 
                         char result = _chess.GetResult();
                         //todo 将行动的棋显示在UI上
-                        OnChessPlay(changes, _chess.publicLayoutAndChanges[changes], role, result);
+                        OnChessPlay(changes, _chess.ChessLayout, role, result);
                         sendResult(result);
 
                         if (result == _chess.NOT_DONE)
@@ -354,7 +362,7 @@ namespace ChessMiddle
                     List<string> changes = _chess.DefaultDo(role);
                     char result = _chess.GetResult();
 
-                    OnChessPlay(changes, _chess.publicLayoutAndChanges[changes], role, result);
+                    OnChessPlay(changes, _chess.ChessLayout, role, result);
                     sendResult(result);
                     if (result == _chess.NOT_DONE)
                         refreshAndNext(stateOne);
@@ -425,9 +433,18 @@ namespace ChessMiddle
         /// 获得棋局
         /// </summary>
         /// <returns></returns>
-        public char[,] getChessLayout()
+        public char[,] GetChessLayout()
         {
             return _chess.ChessLayout;
+        }
+
+        /// <summary>
+        /// 获得棋局的字符串表示
+        /// </summary>
+        /// <returns></returns>
+        public string GetChessLayoutStr()
+        {
+            return _chess.ToString();
         }
 
         /// <summary>

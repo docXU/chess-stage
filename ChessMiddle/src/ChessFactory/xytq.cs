@@ -11,13 +11,7 @@ namespace ChessMiddle.ChessFactory
 {
     class Xytq : IChess
     {
-        //add all possible position
-        private Dictionary<List<string>, char[,]> layoutList;
-        //public List<string> nullList = new List<string>();
-        //add all empty position
-        private Dictionary<List<string>, char[,]> emptyList;
-        //add all rival position
-        private Dictionary<List<string>, char[,]> rivalList;
+
 
         /// <summary>
         /// 对棋局做修改后会保留的一个关于修改序列和得到的棋局的键值对
@@ -56,10 +50,6 @@ namespace ChessMiddle.ChessFactory
             WHITE_KING = 'A';
 
             init();
-            layoutList = new Dictionary<List<string>, char[,]>();
-            rivalList = new Dictionary<List<string>, char[,]>();
-            emptyList = new Dictionary<List<string>, char[,]>();
-            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>();
         }
 
         public Xytq(char[,] layout)
@@ -73,10 +63,6 @@ namespace ChessMiddle.ChessFactory
             WHITE_KING = 'A';
 
             _chessLayout = layout;
-            layoutList = new Dictionary<List<string>, char[,]>();
-            rivalList = new Dictionary<List<string>, char[,]>();
-            emptyList = new Dictionary<List<string>, char[,]>();
-            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>();
         }
 
         private void init()
@@ -96,7 +82,6 @@ namespace ChessMiddle.ChessFactory
         public List<string> DefaultDo(char role)
         {
             Dictionary<List<string>, char[,]> Nexts = NextLayout(role, _chessLayout);
-            publicLayoutAndChanges = new Dictionary<List<string>, char[,]>(Nexts);
 
             int moveableCount = Nexts.Keys.Count;
             List<string>[] forRandom = new List<string>[Nexts.Keys.Count];
@@ -125,11 +110,11 @@ namespace ChessMiddle.ChessFactory
             Dictionary<List<string>, char[,]> Next = NextLayout(role, _chessLayout);
             foreach (List<string> ableMove in Next.Keys)
             {
-                if (actionMove.Equals(ableMove))
+                //验证集合如果有重复会导致验证失败,但这里不需考虑这点
+                if (actionMove.Count == ableMove.Count && actionMove.All(ableMove.Contains))
                 {
-                    publicLayoutAndChanges = new Dictionary<List<string>, char[,]>(Next);
                     _chessLayout = Next[ableMove];
-          
+
                     //变王
                     for (int i = 0; i < _width; i++)
                     {
@@ -152,7 +137,7 @@ namespace ChessMiddle.ChessFactory
         public char GetResult()
         {
             Dictionary<List<string>, char[,]> RoleFirstNext = NextLayout(Role[0], _chessLayout);
-            if(RoleFirstNext.Keys.Count == 0)
+            if (RoleFirstNext.Keys.Count == 0)
             {
                 return Role[1];
             }
@@ -163,7 +148,7 @@ namespace ChessMiddle.ChessFactory
                 return Role[0];
             }
 
-            if(RoleFirstNext.Keys.Count!=0 && RoleSecondNext.Keys.Count != 0)
+            if (RoleFirstNext.Keys.Count != 0 && RoleSecondNext.Keys.Count != 0)
             {
                 return NOT_DONE;
             }
@@ -173,16 +158,19 @@ namespace ChessMiddle.ChessFactory
 
 
         /// <summary>
-        /// 返回棋局的下一个可行解.包含解的解的步骤和棋局
+        /// 返回棋局的下一个可行解.包含解的步骤和棋局
         /// </summary>
         /// <param name="player"></param>
         /// <param name="layout"></param>
         /// <returns></returns>
         public Dictionary<List<string>, char[,]> NextLayout(char player, char[,] layout)
         {
-            layoutList.Clear();
-            rivalList.Clear();
-            emptyList.Clear();
+            //add all possible position
+            Dictionary<List<string>, char[,]> layoutList = new Dictionary<List<string>, char[,]>();
+            //add all empty position
+            Dictionary<List<string>, char[,]> emptyList = new Dictionary<List<string>, char[,]>();
+            //add all eat position
+            Dictionary<List<string>, char[,]> eatList = new Dictionary<List<string>, char[,]>();
 
             char rival = WHITE;
             int nextLine = -1;
@@ -244,8 +232,8 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j - 2));
 
-                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, rivalList, actionMove);
-                                        //rivalList.add(t);
+                                        continueJump(t, i + 2 * nextLine, j - 2, player, rival, eatList, actionMove);
+                                        //eatList.add(t);
                                     }
                                 }
                             }
@@ -288,9 +276,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j + 2));
 
-                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, rivalList, actionMove);
-                                        //rivalList.add(t);
-
+                                        continueJump(t, i + 2 * nextLine, j + 2, player, rival, eatList, actionMove);
                                     }
                                 }
                             }
@@ -333,9 +319,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j - 2));
 
-                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, rivalList, actionMove);
-                                        //rivalList.add(t);
-
+                                        continueJump(t, i - 2 * nextLine, j - 2, player, rival, eatList, actionMove);
                                     }
                                 }
                             }
@@ -377,8 +361,7 @@ namespace ChessMiddle.ChessFactory
                                         List<string> actionMove = new List<string>();
                                         actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j + 2));
 
-                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, rivalList, actionMove);
-                                        //rivalList.add(t);
+                                        continueJump(t, i - 2 * nextLine, j + 2, player, rival, eatList, actionMove);
                                     }
                                 }
                             }
@@ -388,7 +371,7 @@ namespace ChessMiddle.ChessFactory
             }
 
             //not exist compulsory layout
-            if (rivalList.Count == 0)
+            if (eatList.Count == 0)
             {
                 foreach (List<string> am in emptyList.Keys)
                 {
@@ -397,9 +380,9 @@ namespace ChessMiddle.ChessFactory
             }
             else
             {
-                foreach (List<string> am in rivalList.Keys)
+                foreach (List<string> am in eatList.Keys)
                 {
-                    layoutList.Add(am, rivalList[am]);
+                    layoutList.Add(am, eatList[am]);
                 }
             }
 
@@ -425,7 +408,6 @@ namespace ChessMiddle.ChessFactory
                     List<string> newActionMove = Clone<string>(actionMove);
                     newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y - 2));
                     continueJump(t, x - 2, y - 2, player, rival, a, newActionMove);
-                    //a.add(t);
                 }
                 if (x - 2 >= 0 && y + 2 < LENGTH && layout[x - 1, y + 1] == rival && layout[x - 2, y + 2] == EMPTY)
                 {
@@ -440,7 +422,6 @@ namespace ChessMiddle.ChessFactory
                     List<string> newActionMove = Clone<string>(actionMove);
                     newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y + 2));
                     continueJump(t, x - 2, y + 2, player, rival, a, newActionMove);
-                    //a.add(t);
                 }
             }
             if (player == WHITE || player == WHITE_KING || player == BLACK_KING)
@@ -512,7 +493,7 @@ namespace ChessMiddle.ChessFactory
             }
         }
 
-        public void print(char[,] layout, List<string> am)
+        public void Print(char[,] layout, List<string> am)
         {
             int LENGTH = _width;
             for (int i = 0; i < LENGTH; i++)
@@ -550,6 +531,45 @@ namespace ChessMiddle.ChessFactory
             Console.WriteLine();
             Console.WriteLine("----------this is line------------");
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// 把布局转换成字符串输出
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string str = "";
+            for (int i = 0; i < Width; i++)
+            {
+                str += ("|");
+                for (int j = 0; j < Height; j++)
+                {
+                    if (_chessLayout[i, j] == EMPTY)
+                    {
+                        str += (" " + "|");
+                    }
+                    if (_chessLayout[i, j] == WHITE)
+                    {
+                        str += ("a" + "|");
+                    }
+                    if (_chessLayout[i, j] == WHITE_KING)
+                    {
+                        str += ("A" + "|");
+                    }
+                    if (_chessLayout[i, j] == BLACK)
+                    {
+                        str += ("b" + "|");
+                    }
+                    if (_chessLayout[i, j] == BLACK_KING)
+                    {
+                        str += ("B" + "|");
+                    }
+                }
+                str += "\r\n";
+                str += ("-----------------\r\n");
+            }
+            return str;
         }
 
     }

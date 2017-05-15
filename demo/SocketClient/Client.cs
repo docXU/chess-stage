@@ -112,7 +112,7 @@ namespace SocketClient
             string actionString = textBox4.Text;
             action.Add(actionString);
 
-            TxClient.sendMessage(API.getActionAPI(action, "x"));
+            TxClient.sendMessage(API.getActionAPI(action, "a"));
         }
 
         private void textBox4_TextChanged(object sender, EventArgs e)

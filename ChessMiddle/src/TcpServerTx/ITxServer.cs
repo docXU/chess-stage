@@ -29,6 +29,14 @@ namespace ChessMiddle
             get;
         }
         /// <summary>
+        /// 每次通知玩家走棋时限制用时.
+        /// </summary>
+        double LimitThinkSeconds
+        {
+            get;
+            set;
+        }
+        /// <summary>
         /// 允许最多客户端数
         /// </summary>
         int ClientMax
@@ -43,6 +51,16 @@ namespace ChessMiddle
         {
             get;
         }
+        /// <summary>
+        /// 获得棋局
+        /// </summary>
+        /// <returns>返回棋局的二维表示</returns>
+        char[,] GetChessLayout();
+        /// <summary>
+        /// 获得棋局的字符串表示
+        /// </summary>
+        /// <returns>字符串格式</returns>
+        string GetChessLayoutStr();
         /// <summary>
         /// 下棋
         /// </summary>
