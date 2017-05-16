@@ -182,9 +182,12 @@ namespace ChessMiddle.ChessFactory
 
             int nextLine;
             char rival, playerKing, rivalKing;
+            char playerSoldier, rivalSoldier;
             if (player == WHITE || player == WHITE_KING)
             {
                 player = WHITE;
+                playerSoldier = WHITE;
+                rivalSoldier = BLACK;
                 rival = BLACK;
                 nextLine = 1;
                 playerKing = WHITE_KING;
@@ -193,6 +196,8 @@ namespace ChessMiddle.ChessFactory
             else
             {
                 player = BLACK;
+                playerSoldier = BLACK;
+                rivalSoldier = WHITE;
                 rival = WHITE;
                 nextLine = -1;
                 playerKing = BLACK_KING;
@@ -204,7 +209,7 @@ namespace ChessMiddle.ChessFactory
             {
                 for (int j = 0; j < _height; j++)
                 {
-                    if (layout[i, j] == player || layout[i, j] == playerKing)
+                    if (layout[i, j] == playerSoldier || layout[i, j] == playerKing)
                     {
                         player = layout[i, j];
                         //left positon
@@ -299,7 +304,6 @@ namespace ChessMiddle.ChessFactory
                             if (layout[i - nextLine, j - 1] == EMPTY)
                             {
                                 char[,] t = new char[LENGTH, LENGTH];
-
                                 deepClone(t, layout);
 
                                 t[i - nextLine, j - 1] = player;
@@ -339,7 +343,6 @@ namespace ChessMiddle.ChessFactory
                             {
                                 //get next layout
                                 char[,] t = new char[LENGTH, LENGTH];
-
                                 deepClone(t, layout);
 
                                 t[i - nextLine, j + 1] = player;
@@ -356,11 +359,10 @@ namespace ChessMiddle.ChessFactory
                                 if (i - 2 * nextLine < LENGTH && i - 2 * nextLine >= 0 && j + 2 < LENGTH)
                                 {
                                     if (layout[i - 2 * nextLine, j + 2] == EMPTY)
-
                                     {
                                         char[,] t = new char[LENGTH, LENGTH];
-
                                         deepClone(t, layout);
+
                                         t[i - 2 * nextLine, j + 2] = player;
                                         t[i - nextLine, j + 1] = EMPTY;
                                         t[i, j] = EMPTY;
@@ -377,8 +379,6 @@ namespace ChessMiddle.ChessFactory
                 }
             }
 
-            Console.WriteLine("playerKing = " + playerKing);
-            Console.WriteLine("eatDic count = " + eatDic.Count);
             //not exist compulsory layout
             if (eatDic.Count == 0)
             {
