@@ -1,8 +1,10 @@
 ﻿using ChessMiddle;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 namespace SocketServer
 {
@@ -14,6 +16,52 @@ namespace SocketServer
 
         private char[,] chess;
         private ITxServer server = null;
+        private PictureBox[] blackItems;
+        private PictureBox[] redItems;
+
+        public Server()
+        {
+            InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
+            chessUIInit();
+        }
+
+        private void chessUIInit()
+        {
+            this.layerImageBox.Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\dribble.jpg");
+            blackItems = new PictureBox[12];
+            redItems = new PictureBox[12];
+            Random x = new Random();
+            for (int i = 0; i < 12; i++)
+            {
+                blackItems[i] = new PictureBox();
+                layerImageBox.Controls.Add(blackItems[i]);
+                blackItems[i].Name = "black_" + i;
+                blackItems[i].BackColor = Color.Transparent;
+                blackItems[i].Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\black.png");
+                blackItems[i].Size = new System.Drawing.Size(53, 53);
+                blackItems[i].Location = GetAbsoluteLocation(i / 4, ((i / 4) % 2 == 0 ? 1 : 0) + 2 * (i % 4));
+                blackItems[i].BringToFront();
+
+                redItems[i] = new PictureBox();
+                layerImageBox.Controls.Add(redItems[i]);
+                redItems[i].Name = "black_" + i;
+                redItems[i].BackColor = Color.Transparent;
+                redItems[i].Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\red.png");
+                redItems[i].Size = new System.Drawing.Size(53, 53);
+                redItems[i].Location = GetAbsoluteLocation(i / 4 + 5, ((i / 4) % 2 == 0 ? 0 : 1) + 2 * (i % 4));
+                redItems[i].BringToFront();
+            }
+        }
+
+        Point GetAbsoluteLocation(int x, int y)
+        {
+            Point p = new Point();
+            p.Y = 125 + 70 * x;
+            p.X = 28 + 70 * y;
+            return p;
+        }
+
         /// <summary>
         /// 当接收到来之客户端的文本信息的时候
         /// </summary>
@@ -45,14 +93,14 @@ namespace SocketServer
             show(ipEndPoint, "上线");
         }
 
-        ///// <summary>
-        ///// 当对方已收到我方发送数据的时候
-        ///// </summary>
-        ///// <param name="state"></param>
-        //private void dateSuccess(IPEndPoint ipEndPoint)
-        //{
-        //    textBox_msg.Text = "已向" + ipEndPoint.ToString() + "发送成功";
-        //}
+        /// <summary>
+        /// 当对方已收到我方发送数据的时候
+        /// </summary>
+        /// <param name="state"></param>
+        private void datesuccess(IPEndPoint ipendpoint)
+        {
+            //textbox_msg.text = "已向" + ipendpoint.tostring() + "发送成功";
+        }
 
         /// <summary>
         /// 当有客户端掉线的时候
@@ -105,7 +153,6 @@ namespace SocketServer
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-
             try
             {
                 server = TxStart.startServer(int.Parse(textBox_port.Text));
@@ -121,63 +168,91 @@ namespace SocketServer
                 this.button1.Enabled = false;
                 chessInit(server.GetChessLayout());
             }
-            catch (Exception Ex) { MessageBox.Show(Ex.Message); }
+            catch (Exception Ex)
+            {
+                MessageBox.Show(Ex.Message);
+            }
 
         }
 
         private void playChess(List<string> actionMove, char[,] layout, char role, char result)
         {
             //画面的UI处理函数
-
-            //bool eatSome = false;
-            //foreach (string i in actionMove)
-            //{
-            //    Console.WriteLine(i);
-            //    eatSome = false;
-            //    string[] typeEat = Regex.Split(i, "--");
-
-            //    if (typeEat.Length == 2)
-            //    {
-            //        eatSome = true;
-            //    }
-
-            //    string oldPos;
-            //    string newPos;
-            //    if (eatSome)
-            //    {
-            //        oldPos = typeEat[0];
-            //        newPos = typeEat[1];
-            //        Console.WriteLine("eat: " + i);
-            //    }
-            //    else
-            //    {
-            //        string[] typePush = Regex.Split(i, "-");
-            //        for (int j = 0; j < typePush.Length; j++)
-            //            Console.WriteLine("just push: " + typePush[j]);
-            //        oldPos = typePush[0];
-            //        newPos = typePush[1];
-
-            //    }
-
-            //    int x_old = int.Parse(oldPos.Split(',')[0]);
-            //    int y_old = int.Parse(oldPos.Split(',')[1]);
-            //    int x_new = int.Parse(newPos.Split(',')[0]);
-            //    int y_new = int.Parse(newPos.Split(',')[1]);
-
-            //    if (eatSome)
-            //    {
-            //        chess[x_old, y_old] = '0';
-            //        chess[(x_old + x_new) / 2, (y_old + y_new) / 2] = '0';
-            //        chess[x_new, y_new] = role;
-            //    }
-            //    else
-            //    {
-            //        chess[x_old, y_old] = '0';
-            //        chess[x_new, y_new] = role;
-            //    }
-
-            //}
             convertToUI(layout, result);
+
+            foreach(string s in actionMove)
+            {
+                string[] posFormat = Regex.Split(s, "-");
+                int startPointX = Convert.ToInt32(posFormat[0].Split(',')[0]);
+                int startPointY = Convert.ToInt32(posFormat[0].Split(',')[1]);
+                int endPointX = Convert.ToInt32(posFormat[1].Split(',')[0]);
+                int endPointY = Convert.ToInt32(posFormat[1].Split(',')[1]);
+                Point startPos = GetAbsoluteLocation(startPointX, startPointY);
+                Point endPos = GetAbsoluteLocation(endPointX, endPointY);
+                Point victimPos= new Point(0,0);
+                //这里的70表示两个点之间的距离超过一个格子的大小
+                if (Math.Abs(startPointX - endPointX) > 1)
+                {
+                    victimPos = GetAbsoluteLocation((startPointX + endPointX) / 2, (endPointY + startPointY) / 2);
+                }
+                if (role == 'a')
+                {
+                    foreach (PictureBox pb in blackItems)
+                    {
+                        if (pb.Location.Equals(startPos))
+                        {
+                            pb.Location = endPos;
+                            if (endPointX == 7)
+                            {
+                                pb.ImageLocation = @"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\blackKing.png";
+                            }
+                        }
+                    }
+                    foreach (PictureBox pb in redItems)
+                    {
+                        if (pb.Location.Equals(victimPos))
+                        {
+                            pb.Location = new Point(50, 20);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (PictureBox pb in redItems)
+                    {
+                        if (pb.Location.Equals(startPos))
+                        {
+                            pb.Location = endPos;
+                            if (endPointX == 0)
+                            {
+                                pb.ImageLocation = @"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\redKing.png";
+                            }
+                        }
+                    }
+                    foreach (PictureBox pb in blackItems)
+                    {
+                        if (pb.Location.Equals(victimPos))
+                        {
+                            pb.Location = new Point(50, 740);
+                        }
+                    }
+                }
+                
+            }
+            
+        }
+
+        private void chessInit(char[,] chessLayout)
+        {
+            chess = chessLayout;
+            convertToUI(chess, '~');
+
+        }
+
+        private void convertToUI(char[,] layout, char result)
+        {
+            string UI = server.GetChessLayoutStr();
+            this.textBox1.Text = UI + "\r\n 局势:" + result;
         }
 
         /// <summary>
@@ -192,22 +267,40 @@ namespace SocketServer
         }
         #endregion
 
-        public Server()
+        private void button2_Click(object sender, EventArgs e)
         {
-            InitializeComponent();
+            Thread move = new Thread(new ParameterizedThreadStart(moveFun))
+            {
+                IsBackground = true
+
+            };
+            move.Start(1);
+        }
+
+        private void moveFun(object j)
+        {
+            int l = int.Parse(j.ToString());
+            while (1 == 1)
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    blackItems[i].Location = new Point(blackItems[i].Location.X + 1, blackItems[i].Location.Y + 1);
+                }
+                Thread.Sleep(5);
+            }
 
         }
 
-        private void chessInit(char[,] chessLayout)
-        {
-            chess = chessLayout;
-            convertToUI(chess, '~');
-        }
-
-        private void convertToUI(char[,] layout, char result)
-        {
-            string UI = server.GetChessLayoutStr();
-            this.textBox1.Text = UI + "\r\n 局势:" + result;
-        }
+        //private delegate void myDelegate(int index, Point b);
+        //private void SetLocation(int index, Point b)
+        //{
+        //    if (this.blackItems[index].InvokeRequired)
+        //    {
+        //        myDelegate md = new myDelegate(this.SetLocation);
+        //        this.Invoke(md, new object[] { index ,b });
+        //    }
+        //    else
+        //        this.blackItems[index].Location = b;
+        //}
     }
 }

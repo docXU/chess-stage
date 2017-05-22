@@ -243,7 +243,7 @@ namespace ChessMiddle.ChessFactory
                                         t[i, j] = EMPTY;
 
                                         List<string> actionMove = new List<string>();
-                                        actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j - 2));
+                                        actionMove.Add("" + i + "," + j + "-" + (i + 2 * nextLine) + "," + (j - 2));
 
                                         continueJump(t, i + 2 * nextLine, j - 2, player, rival, eatDic, actionMove);
                                     }
@@ -285,7 +285,7 @@ namespace ChessMiddle.ChessFactory
                                         t[i, j] = EMPTY;
 
                                         List<string> actionMove = new List<string>();
-                                        actionMove.Add("" + i + "," + j + "--" + (i + 2 * nextLine) + "," + (j + 2));
+                                        actionMove.Add("" + i + "," + j + "-" + (i + 2 * nextLine) + "," + (j + 2));
 
                                         continueJump(t, i + 2 * nextLine, j + 2, player, rival, eatDic, actionMove);
                                     }
@@ -328,7 +328,7 @@ namespace ChessMiddle.ChessFactory
                                         t[i, j] = EMPTY;
 
                                         List<string> actionMove = new List<string>();
-                                        actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j - 2));
+                                        actionMove.Add("" + i + "," + j + "-" + (i - 2 * nextLine) + "," + (j - 2));
 
                                         continueJump(t, i - 2 * nextLine, j - 2, player, rival, eatDic, actionMove);
                                     }
@@ -368,7 +368,7 @@ namespace ChessMiddle.ChessFactory
                                         t[i, j] = EMPTY;
 
                                         List<string> actionMove = new List<string>();
-                                        actionMove.Add("" + i + "," + j + "--" + (i - 2 * nextLine) + "," + (j + 2));
+                                        actionMove.Add("" + i + "," + j + "-" + (i - 2 * nextLine) + "," + (j + 2));
 
                                         continueJump(t, i - 2 * nextLine, j + 2, player, rival, eatDic, actionMove);
                                     }
@@ -415,7 +415,7 @@ namespace ChessMiddle.ChessFactory
                     t[x, y] = EMPTY;
 
                     List<string> newActionMove = Clone<string>(actionMove);
-                    newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y - 2));
+                    newActionMove.Add("" + x + "," + y + "-" + (x - 2) + "," + (y - 2));
                     continueJump(t, x - 2, y - 2, player, rival, a, newActionMove);
                 }
                 if (x - 2 >= 0 && y + 2 < LENGTH && layout[x - 1, y + 1] == rival && layout[x - 2, y + 2] == EMPTY)
@@ -429,7 +429,7 @@ namespace ChessMiddle.ChessFactory
                     t[x, y] = EMPTY;
 
                     List<string> newActionMove = Clone<string>(actionMove);
-                    newActionMove.Add("" + x + "," + y + "--" + (x - 2) + "," + (y + 2));
+                    newActionMove.Add("" + x + "," + y + "-" + (x - 2) + "," + (y + 2));
                     continueJump(t, x - 2, y + 2, player, rival, a, newActionMove);
                 }
             }
@@ -446,7 +446,7 @@ namespace ChessMiddle.ChessFactory
                     t[x, y] = EMPTY;
 
                     List<string> newActionMove = Clone<string>(actionMove);
-                    newActionMove.Add("" + x + "," + y + "--" + (x + 2) + "," + (y - 2));
+                    newActionMove.Add("" + x + "," + y + "-" + (x + 2) + "," + (y - 2));
                     continueJump(t, x + 2, y + 2, player, rival, a, newActionMove);
                 }
                 if (x + 2 < LENGTH && y + 2 < LENGTH && layout[x + 1, y + 1] == rival && layout[x + 2, y + 2] == EMPTY)
@@ -460,7 +460,7 @@ namespace ChessMiddle.ChessFactory
                     t[x, y] = EMPTY;
 
                     List<string> newActionMove = Clone<string>(actionMove);
-                    newActionMove.Add("" + x + "," + y + "--" + (x + 2) + "," + (y + 2));
+                    newActionMove.Add("" + x + "," + y + "-" + (x + 2) + "," + (y + 2));
                     continueJump(t, x + 2, y + 2, player, rival, a, newActionMove);
                 }
 

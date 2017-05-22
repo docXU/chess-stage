@@ -116,7 +116,7 @@ namespace ChessMiddle
                     {'0',  '0', 'a',  'a',  '0',  '0',  '0',  '0' },
                     {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
             };
-            _chess = new Xytq(layout);
+            _chess = new Xytq();
             _clientMax = _chess.Role.Length;
             try
             {

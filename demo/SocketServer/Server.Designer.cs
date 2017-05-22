@@ -40,8 +40,13 @@
             this.button1 = new System.Windows.Forms.Button();
             this.textBox_port = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.layerImageBox = new System.Windows.Forms.PictureBox();
+            this.chessPanel = new System.Windows.Forms.Panel();
+            this.button2 = new System.Windows.Forms.Button();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.layerImageBox)).BeginInit();
+            this.chessPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // label_zt
@@ -158,17 +163,48 @@
             this.label1.Text = "监听端口：";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // layerImageBox
+            // 
+            this.layerImageBox.Location = new System.Drawing.Point(0, 0);
+            this.layerImageBox.Name = "layerImageBox";
+            this.layerImageBox.Size = new System.Drawing.Size(600, 800);
+            this.layerImageBox.TabIndex = 16;
+            this.layerImageBox.TabStop = false;
+            // 
+            // chessPanel
+            // 
+            this.chessPanel.BackColor = System.Drawing.SystemColors.Window;
+            this.chessPanel.Controls.Add(this.layerImageBox);
+            this.chessPanel.Location = new System.Drawing.Point(453, 12);
+            this.chessPanel.Name = "chessPanel";
+            this.chessPanel.Size = new System.Drawing.Size(600, 800);
+            this.chessPanel.TabIndex = 17;
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(220, 633);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 18;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(430, 570);
+            this.ClientSize = new System.Drawing.Size(1072, 837);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.chessPanel);
             this.Controls.Add(this.groupBox3);
             this.Name = "Server";
             this.Text = "服务器";
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.layerImageBox)).EndInit();
+            this.chessPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -187,5 +223,8 @@
         private System.Windows.Forms.TextBox textBox_port;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.PictureBox layerImageBox;
+        private System.Windows.Forms.Panel chessPanel;
+        private System.Windows.Forms.Button button2;
     }
 }
