@@ -2,7 +2,6 @@
 using ChessMiddle.PublicClass;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Net;
 using System.Windows.Forms;
 namespace SocketClient
