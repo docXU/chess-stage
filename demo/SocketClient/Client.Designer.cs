@@ -28,28 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button2 = new System.Windows.Forms.Button();
+            this.connectBtn = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textBox4 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
-            this.textBox4 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // button2
+            // connectBtn
             // 
-            this.button2.Location = new System.Drawing.Point(79, 103);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(122, 30);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "连接服务器";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.connectBtn.Location = new System.Drawing.Point(79, 103);
+            this.connectBtn.Name = "connectBtn";
+            this.connectBtn.Size = new System.Drawing.Size(122, 30);
+            this.connectBtn.TabIndex = 1;
+            this.connectBtn.Text = "连接服务器";
+            this.connectBtn.UseVisualStyleBackColor = true;
+            this.connectBtn.Click += new System.EventHandler(this.connectBtn_Click);
             // 
             // textBox1
             // 
@@ -102,16 +102,23 @@
             this.groupBox1.Controls.Add(this.button8);
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.textBox3);
-            this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Controls.Add(this.connectBtn);
             this.groupBox1.Controls.Add(this.textBox2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(227, 396);
+            this.groupBox1.Size = new System.Drawing.Size(227, 279);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "TCP客户端区";
+            // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(15, 158);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.Size = new System.Drawing.Size(105, 21);
+            this.textBox4.TabIndex = 8;
             // 
             // button1
             // 
@@ -133,14 +140,6 @@
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
-            // textBox4
-            // 
-            this.textBox4.Location = new System.Drawing.Point(15, 158);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(105, 21);
-            this.textBox4.TabIndex = 8;
-            this.textBox4.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
-            // 
             // Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -156,7 +155,7 @@
         }
 
         #endregion
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button connectBtn;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

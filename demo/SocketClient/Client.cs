@@ -10,7 +10,8 @@ namespace SocketClient
     {
         #region TCP客户端区
         private ITxClient TxClient = null;
-        private void button2_Click(object sender, EventArgs e)
+
+        private void connectBtn_Click(object sender, EventArgs e)
         {
             try
             {
@@ -27,6 +28,7 @@ namespace SocketClient
                 MessageBox.Show(Ex.Message);
             }
         }
+
         /// <summary>
         /// 当数据发送成功的时候
         /// </summary>
@@ -41,7 +43,7 @@ namespace SocketClient
         {
             textBox1.Text = "客户端已经关闭";
             this.button1.Enabled = false;
-            this.button2.Enabled = true;
+            this.connectBtn.Enabled = true;
         }
         /// <summary>
         /// 当客户端突然断开的时候
@@ -56,7 +58,7 @@ namespace SocketClient
         /// </summary>
         private void reconnectionStart()
         {
-            textBox1.Text = "10秒后自动重连开始";
+            textBox1.Text = "10秒后自动重连";
         }
         /// <summary>
         /// 当登录有结果的时候
@@ -69,12 +71,12 @@ namespace SocketClient
             if (b)
             {
                 this.button1.Enabled = true;
-                this.button2.Enabled = false;
+                this.connectBtn.Enabled = false;
             }
             else
             {
                 this.button1.Enabled = false;
-                this.button2.Enabled = true;
+                this.connectBtn.Enabled = true;
             }
         }
         /// <summary>
@@ -112,11 +114,6 @@ namespace SocketClient
             action.Add(actionString);
 
             TxClient.sendMessage(API.getActionAPI(action, "a"));
-        }
-
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 

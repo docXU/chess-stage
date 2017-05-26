@@ -42,7 +42,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.layerImageBox = new System.Windows.Forms.PictureBox();
             this.chessPanel = new System.Windows.Forms.Panel();
-            this.button2 = new System.Windows.Forms.Button();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.layerImageBox)).BeginInit();
@@ -52,7 +51,7 @@
             // label_zt
             // 
             this.label_zt.AutoSize = true;
-            this.label_zt.Location = new System.Drawing.Point(28, 523);
+            this.label_zt.Location = new System.Drawing.Point(31, 672);
             this.label_zt.Name = "label_zt";
             this.label_zt.Size = new System.Drawing.Size(17, 12);
             this.label_zt.TabIndex = 12;
@@ -61,7 +60,7 @@
             // label_all
             // 
             this.label_all.AutoSize = true;
-            this.label_all.Location = new System.Drawing.Point(301, 523);
+            this.label_all.Location = new System.Drawing.Point(304, 672);
             this.label_all.Name = "label_all";
             this.label_all.Size = new System.Drawing.Size(89, 12);
             this.label_all.TabIndex = 13;
@@ -78,14 +77,14 @@
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Location = new System.Drawing.Point(12, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(414, 552);
+            this.groupBox3.Size = new System.Drawing.Size(414, 687);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "TCP服务器";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(39, 251);
+            this.textBox1.Location = new System.Drawing.Point(33, 389);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(337, 255);
@@ -99,7 +98,7 @@
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(9, 54);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(398, 194);
+            this.groupBox2.Size = new System.Drawing.Size(398, 329);
             this.groupBox2.TabIndex = 19;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "收到的消息";
@@ -116,7 +115,7 @@
             this.listView1.Location = new System.Drawing.Point(3, 17);
             this.listView1.Name = "listView1";
             this.listView1.ShowItemToolTips = true;
-            this.listView1.Size = new System.Drawing.Size(392, 174);
+            this.listView1.Size = new System.Drawing.Size(392, 309);
             this.listView1.TabIndex = 10;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -180,22 +179,11 @@
             this.chessPanel.Size = new System.Drawing.Size(600, 800);
             this.chessPanel.TabIndex = 17;
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(220, 633);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 18;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1072, 837);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.chessPanel);
             this.Controls.Add(this.groupBox3);
             this.Name = "Server";
@@ -225,6 +213,5 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.PictureBox layerImageBox;
         private System.Windows.Forms.Panel chessPanel;
-        private System.Windows.Forms.Button button2;
     }
 }

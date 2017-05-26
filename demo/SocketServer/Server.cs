@@ -28,7 +28,7 @@ namespace SocketServer
 
         private void chessUIInit()
         {
-            this.layerImageBox.Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\dribble.jpg");
+            this.layerImageBox.Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\dribble.jpg"));
             blackItems = new PictureBox[12];
             redItems = new PictureBox[12];
             Random x = new Random();
@@ -38,16 +38,16 @@ namespace SocketServer
                 layerImageBox.Controls.Add(blackItems[i]);
                 blackItems[i].Name = "black_" + i;
                 blackItems[i].BackColor = Color.Transparent;
-                blackItems[i].Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\black.png");
+                blackItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\black.png"));
                 blackItems[i].Size = new System.Drawing.Size(53, 53);
                 blackItems[i].Location = GetAbsoluteLocation(i / 4, ((i / 4) % 2 == 0 ? 1 : 0) + 2 * (i % 4));
                 blackItems[i].BringToFront();
 
                 redItems[i] = new PictureBox();
                 layerImageBox.Controls.Add(redItems[i]);
-                redItems[i].Name = "black_" + i;
+                redItems[i].Name = "red_" + i;
                 redItems[i].BackColor = Color.Transparent;
-                redItems[i].Load(@"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\red.png");
+                redItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\red.png"));
                 redItems[i].Size = new System.Drawing.Size(53, 53);
                 redItems[i].Location = GetAbsoluteLocation(i / 4 + 5, ((i / 4) % 2 == 0 ? 0 : 1) + 2 * (i % 4));
                 redItems[i].BringToFront();
@@ -110,17 +110,6 @@ namespace SocketServer
         private void disconnection(IPEndPoint ipEndPoint, string str)
         {
             show(ipEndPoint, "下线");
-            chessInit(new char[8, 8]
-                {
-                    {'0',  'a', '0',  'a',  '0',  'a',  '0',  'a' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
-                    {'0',  'a', '0',  '0',  'a',  '0',  'a',  '0' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
-                    {'0',  '0', 'a',  '0',  'a',  '0',  '0',  '0' },
-                    {'0',  '0', '0',  'B',  '0',  '0',  '0',  '0' },
-                    {'0',  '0', 'a',  'b',  'a',  '0',  '0',  '0' },
-                    {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
-                });
         }
 
         /// <summary>
@@ -138,6 +127,17 @@ namespace SocketServer
         private void engineLost(string str)
         {
             MessageBox.Show(str);
+        }
+
+        /// <summary>
+        /// 下面显示的
+        /// </summary>
+        /// <param name="ipEndPoint"></param>
+        /// <param name="str"></param>
+        private void show(IPEndPoint ipEndPoint, string str)
+        {
+            label_zt.Text = ipEndPoint.ToString() + ":" + str;
+            label_all.Text = "当前在线人数:" + this.server.ClientNumber.ToString();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -204,7 +204,7 @@ namespace SocketServer
                             pb.Location = endPos;
                             if (endPointX == 7)
                             {
-                                pb.ImageLocation = @"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\blackKing.png";
+                                pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\blackKing.png");
                             }
                         }
                     }
@@ -225,7 +225,7 @@ namespace SocketServer
                             pb.Location = endPos;
                             if (endPointX == 0)
                             {
-                                pb.ImageLocation = @"C:\Users\FEyn\Desktop\ChessStage\demo\SocketServer\res\redKing.png";
+                                pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\redKing.png");
                             }
                         }
                     }
@@ -254,28 +254,7 @@ namespace SocketServer
             string UI = server.GetChessLayoutStr();
             this.textBox1.Text = UI + "\r\n 局势:" + result;
         }
-
-        /// <summary>
-        /// 下面显示的
-        /// </summary>
-        /// <param name="ipEndPoint"></param>
-        /// <param name="str"></param>
-        private void show(IPEndPoint ipEndPoint, string str)
-        {
-            label_zt.Text = ipEndPoint.ToString() + ":" + str;
-            label_all.Text = "当前在线人数:" + this.server.ClientNumber.ToString();
-        }
         #endregion
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            Thread move = new Thread(new ParameterizedThreadStart(moveFun))
-            {
-                IsBackground = true
-
-            };
-            move.Start(1);
-        }
 
         private void moveFun(object j)
         {

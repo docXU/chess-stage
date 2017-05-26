@@ -366,9 +366,10 @@ namespace ChessMiddle
                 {
                     if (!clientCheck(stateOne.IpEndPoint))
                         return;
-                    Send(stateOne, API.getTimeoutAPI());
+                   
                     //使用默认走棋方法
                     char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
+                    Send(stateOne, API.getTimeoutAPI());
                     List<string> changes = _chess.DefaultDo(role);
                     char result = _chess.GetResult();
 
