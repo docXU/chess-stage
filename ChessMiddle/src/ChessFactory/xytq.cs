@@ -14,7 +14,6 @@ namespace ChessMiddle.ChessFactory
         public char EMPTY { get => '0'; }
         public char NOT_DONE { get => '~'; }
         public char DRAW { get => 'd'; }
-
         private char[,] _chessLayout;
         private int _width;
         private int _height;
@@ -80,16 +79,15 @@ namespace ChessMiddle.ChessFactory
                 return null;
             }
 
-            int o = 0;
-            foreach(List<string> l in Nexts.Keys)
-            {
-                o++;
-                Console.WriteLine("index of Keys:" + o);
-                foreach (string s in l)
-                {
-                    Console.WriteLine(s);
-                }
-            }
+            //int o = 0;
+            //foreach(List<string> l in Nexts.Keys)
+            //{
+            //    o++;
+            //    foreach (string s in l)
+            //    {
+            //        Console.WriteLine(s);
+            //    }
+            //}
 
             int moveableCount = Nexts.Keys.Count;
             List<string>[] forRandom = new List<string>[Nexts.Keys.Count];
@@ -447,7 +445,7 @@ namespace ChessMiddle.ChessFactory
 
                     List<string> newActionMove = Clone<string>(actionMove);
                     newActionMove.Add("" + x + "," + y + "-" + (x + 2) + "," + (y - 2));
-                    continueJump(t, x + 2, y + 2, player, rival, a, newActionMove);
+                    continueJump(t, x + 2, y - 2, player, rival, a, newActionMove);
                 }
                 if (x + 2 < LENGTH && y + 2 < LENGTH && layout[x + 1, y + 1] == rival && layout[x + 2, y + 2] == EMPTY)
                 {
@@ -534,8 +532,8 @@ namespace ChessMiddle.ChessFactory
                 Console.WriteLine();
                 Console.WriteLine("-----------------");
             }
-            foreach (string a in am)
-                Console.WriteLine(a);
+            //foreach (string a in am)
+            //    Console.WriteLine(a);
 
             Console.WriteLine();
             Console.WriteLine("----------this is line------------");

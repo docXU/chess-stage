@@ -8,8 +8,6 @@ using System.Threading;
 using System.Windows.Forms;
 namespace SocketServer
 {
-
-
     public partial class Server : Form
     {
         #region TCPServer服务器
@@ -18,60 +16,16 @@ namespace SocketServer
         private ITxServer server = null;
         private PictureBox[] blackItems;
         private PictureBox[] redItems;
+        private Boolean PieceIsMoving;
 
         public Server()
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
             chessUIInit();
+            PieceIsMoving = false;
         }
 
-        private void chessUIInit()
-        {
-            this.layerImageBox.Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\dribble.jpg"));
-            blackItems = new PictureBox[12];
-            redItems = new PictureBox[12];
-            Random x = new Random();
-            for (int i = 0; i < 12; i++)
-            {
-                blackItems[i] = new PictureBox();
-                layerImageBox.Controls.Add(blackItems[i]);
-                blackItems[i].Name = "black_" + i;
-                blackItems[i].BackColor = Color.Transparent;
-                blackItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\black.png"));
-                blackItems[i].Size = new System.Drawing.Size(53, 53);
-                blackItems[i].Location = GetAbsoluteLocation(i / 4, ((i / 4) % 2 == 0 ? 1 : 0) + 2 * (i % 4));
-                blackItems[i].BringToFront();
-
-                redItems[i] = new PictureBox();
-                layerImageBox.Controls.Add(redItems[i]);
-                redItems[i].Name = "red_" + i;
-                redItems[i].BackColor = Color.Transparent;
-                redItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\red.png"));
-                redItems[i].Size = new System.Drawing.Size(53, 53);
-                redItems[i].Location = GetAbsoluteLocation(i / 4 + 5, ((i / 4) % 2 == 0 ? 0 : 1) + 2 * (i % 4));
-                redItems[i].BringToFront();
-            }
-        }
-
-        Point GetAbsoluteLocation(int x, int y)
-        {
-            Point p = new Point();
-            p.Y = 125 + 70 * x;
-            p.X = 28 + 70 * y;
-            return p;
-        }
-
-        /// <summary>
-        /// 当接收到来之客户端的文本信息的时候
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="str"></param>
-        private void acceptString(IPEndPoint ipEndPoint, string str)
-        {
-            ListViewItem item = new ListViewItem(new string[] { DateTime.Now.ToString(), ipEndPoint.ToString(), str });
-            this.listView1.Items.Insert(0, item);
-        }
         /// <summary>
         /// 当接收到来之客户端的字节信息的时候
         /// </summary>
@@ -82,8 +36,8 @@ namespace SocketServer
             ListViewItem item = new ListViewItem(new string[] { DateTime.Now.ToString(),
                 ipEndPoint.ToString(), System.Text.Encoding.Default.GetString(bytes) });
             this.listView1.Items.Insert(0, item);
-            //MessageBox.Show(bytes.Length.ToString());
         }
+
         /// <summary>
         /// 当有客户端连接上来的时候
         /// </summary>
@@ -91,6 +45,7 @@ namespace SocketServer
         private void connect(IPEndPoint ipEndPoint)
         {
             show(ipEndPoint, "上线");
+            ResetChessUI();
         }
 
         /// <summary>
@@ -163,7 +118,7 @@ namespace SocketServer
                 server.EngineClose += new TxDelegate(engineClose);
                 server.EngineLost += new TxDelegate<string>(engineLost);
                 server.PlayChess += new TxDelegate<List<string>, char[,], char, char>(playChess);
-                server.LimitThinkSeconds = 2;
+                server.LimitThinkSeconds = 3;
                 server.StartEngine();
                 this.button1.Enabled = false;
                 chessInit(server.GetChessLayout());
@@ -175,78 +130,201 @@ namespace SocketServer
 
         }
 
+        private void chessUIInit()
+        {
+            this.layerImageBox.Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\dribble.jpg"));
+            blackItems = new PictureBox[12];
+            redItems = new PictureBox[12];
+            Random x = new Random();
+            for (int i = 0; i < 12; i++)
+            {
+                blackItems[i] = new PictureBox();
+                layerImageBox.Controls.Add(blackItems[i]);
+                blackItems[i].Name = "black_" + i;
+                blackItems[i].BackColor = Color.Transparent;
+                blackItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\black.png"));
+                blackItems[i].Size = new System.Drawing.Size(53, 53);
+                blackItems[i].Location = GetAbsoluteLocation(i / 4, ((i / 4) % 2 == 0 ? 1 : 0) + 2 * (i % 4));
+                blackItems[i].BringToFront();
+
+                redItems[i] = new PictureBox();
+                layerImageBox.Controls.Add(redItems[i]);
+                redItems[i].Name = "red_" + i;
+                redItems[i].BackColor = Color.Transparent;
+                redItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\red.png"));
+                redItems[i].Size = new System.Drawing.Size(53, 53);
+                redItems[i].Location = GetAbsoluteLocation(i / 4 + 5, ((i / 4) % 2 == 0 ? 0 : 1) + 2 * (i % 4));
+                redItems[i].BringToFront();
+            }
+        }
+
+        private void ResetChessUI()
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                blackItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\black.png"));
+                blackItems[i].Location = GetAbsoluteLocation(i / 4, ((i / 4) % 2 == 0 ? 1 : 0) + 2 * (i % 4));
+                redItems[i].Load(System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\red.png"));
+                redItems[i].Location = GetAbsoluteLocation(i / 4 + 5, ((i / 4) % 2 == 0 ? 0 : 1) + 2 * (i % 4));
+            }
+            resultLabel.Text = ":)";
+        }
+
+        Point GetAbsoluteLocation(int x, int y)
+        {
+            Point p = new Point();
+            p.Y = 125 + 70 * x;
+            p.X = 28 + 70 * y;
+            return p;
+        }
+
+        private void movePieceAsyn(List<string> actionMove, char[,] layout, char role, char result)
+        {
+            new Thread(new ThreadStart(() =>
+            {
+                foreach (string s in actionMove)
+                {
+                    Console.WriteLine(s);
+                }
+                foreach (string s in actionMove)
+                {
+                    Console.WriteLine("do move: " + s);
+                    Thread.Sleep(10);
+                    string[] posFormat = Regex.Split(s, "-");
+                    int startPointX = Convert.ToInt32(posFormat[0].Split(',')[0]);
+                    int startPointY = Convert.ToInt32(posFormat[0].Split(',')[1]);
+                    int endPointX = Convert.ToInt32(posFormat[1].Split(',')[0]);
+                    int endPointY = Convert.ToInt32(posFormat[1].Split(',')[1]);
+                    Point startPos = GetAbsoluteLocation(startPointX, startPointY);
+                    Point endPos = GetAbsoluteLocation(endPointX, endPointY);
+                    Point victimPos = new Point(0, 0);
+                    if (Math.Abs(startPointX - endPointX) > 1)
+                    {
+                        victimPos = GetAbsoluteLocation((startPointX + endPointX) / 2, (endPointY + startPointY) / 2);
+                    }
+                    PieceIsMoving = true;
+                    if (role == 'a')
+                    {
+                        foreach (PictureBox pb in blackItems)
+                        {
+                            if (pb.Location.Equals(startPos))
+                            {
+                                new Thread(new ThreadStart(() =>
+                                {
+                                    moveFun(pb, startPos, endPos);
+                                    if (endPointX == 7)
+                                    {
+                                        pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\blackKing.png");
+                                    }
+                                    foreach (PictureBox pbv in redItems)
+                                    {
+                                        if (pbv.Location.Equals(victimPos))
+                                        {
+                                            pbv.Location = new Point(50, 20);
+                                        }
+                                    }
+                                })).Start();
+
+                                //pb.Location = endPos;
+                                //if (endPointX == 7)
+                                //{
+                                //    pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\blackKing.png");
+                                //}
+                                //foreach (PictureBox pbv in redItems)
+                                //{
+                                //    if (pbv.Location.Equals(victimPos))
+                                //    {
+                                //        pbv.Location = new Point(50, 20);
+                                //    }
+                                //}
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (PictureBox pb in redItems)
+                        {
+                            if (pb.Location.Equals(startPos))
+                            {
+                                new Thread(new ThreadStart(() =>
+                                {
+                                    moveFun(pb, startPos, endPos);
+                                    if (endPointX == 0)
+                                    {
+                                        pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\redKing.png");
+                                    }
+                                    foreach (PictureBox pbv in blackItems)
+                                    {
+                                        if (pbv.Location.Equals(victimPos))
+                                        {
+                                            pbv.Location = new Point(50, 740);
+                                        }
+                                    }
+                                })).Start();
+
+                                //pb.Location = endPos;
+                                //if (endPointX == 0)
+                                //{
+                                //    pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\redKing.png");
+                                //}
+                                //foreach (PictureBox pbv in blackItems)
+                                //{
+                                //    if (pbv.Location.Equals(victimPos))
+                                //    {
+                                //        pbv.Location = new Point(50, 740);
+                                //    }
+                                //}
+                            }
+                        }
+                    }
+
+                    while (PieceIsMoving == true)
+                    {
+                        Thread.Sleep(1000);
+                    }
+
+                }
+            })).Start();
+            
+        }
+
         private void playChess(List<string> actionMove, char[,] layout, char role, char result)
         {
             //画面的UI处理函数
             convertToUI(layout, result);
-
-            foreach(string s in actionMove)
+            if (result == 'a' || result == 'b')
             {
-                string[] posFormat = Regex.Split(s, "-");
-                int startPointX = Convert.ToInt32(posFormat[0].Split(',')[0]);
-                int startPointY = Convert.ToInt32(posFormat[0].Split(',')[1]);
-                int endPointX = Convert.ToInt32(posFormat[1].Split(',')[0]);
-                int endPointY = Convert.ToInt32(posFormat[1].Split(',')[1]);
-                Point startPos = GetAbsoluteLocation(startPointX, startPointY);
-                Point endPos = GetAbsoluteLocation(endPointX, endPointY);
-                Point victimPos= new Point(0,0);
-                //这里的70表示两个点之间的距离超过一个格子的大小
-                if (Math.Abs(startPointX - endPointX) > 1)
-                {
-                    victimPos = GetAbsoluteLocation((startPointX + endPointX) / 2, (endPointY + startPointY) / 2);
-                }
-                if (role == 'a')
-                {
-                    foreach (PictureBox pb in blackItems)
-                    {
-                        if (pb.Location.Equals(startPos))
-                        {
-                            pb.Location = endPos;
-                            if (endPointX == 7)
-                            {
-                                pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\blackKing.png");
-                            }
-                        }
-                    }
-                    foreach (PictureBox pb in redItems)
-                    {
-                        if (pb.Location.Equals(victimPos))
-                        {
-                            pb.Location = new Point(50, 20);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (PictureBox pb in redItems)
-                    {
-                        if (pb.Location.Equals(startPos))
-                        {
-                            pb.Location = endPos;
-                            if (endPointX == 0)
-                            {
-                                pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\redKing.png");
-                            }
-                        }
-                    }
-                    foreach (PictureBox pb in blackItems)
-                    {
-                        if (pb.Location.Equals(victimPos))
-                        {
-                            pb.Location = new Point(50, 740);
-                        }
-                    }
-                }
-                
+                resultLabel.Text = "winner：" + result;
             }
-            
+            else
+            {
+                movePieceAsyn(actionMove, layout, role, result);
+            }
+        }
+
+        private void moveFun(PictureBox piece, Point startPoint, Point endPoint)
+        {
+            int speed = 4;
+            while (1 == 1)
+            {
+                int xVector = (endPoint.X - startPoint.X) > 0 ? 1 : -1;
+                int yVector = (endPoint.Y - startPoint.Y) > 0 ? 1 : -1;
+                piece.Location = new Point(piece.Location.X + xVector, piece.Location.Y + yVector);
+                if (piece.Location.Equals(endPoint))
+                {
+                    Console.WriteLine("move end");
+                    PieceIsMoving = false;
+                    break;
+                }
+                Thread.Sleep(speed);
+            }
+
         }
 
         private void chessInit(char[,] chessLayout)
         {
             chess = chessLayout;
             convertToUI(chess, '~');
-
         }
 
         private void convertToUI(char[,] layout, char result)
@@ -255,20 +333,6 @@ namespace SocketServer
             this.textBox1.Text = UI + "\r\n 局势:" + result;
         }
         #endregion
-
-        private void moveFun(object j)
-        {
-            int l = int.Parse(j.ToString());
-            while (1 == 1)
-            {
-                for (int i = 0; i < 12; i++)
-                {
-                    blackItems[i].Location = new Point(blackItems[i].Location.X + 1, blackItems[i].Location.Y + 1);
-                }
-                Thread.Sleep(5);
-            }
-
-        }
 
         //private delegate void myDelegate(int index, Point b);
         //private void SetLocation(int index, Point b)

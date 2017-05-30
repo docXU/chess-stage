@@ -42,6 +42,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.layerImageBox = new System.Windows.Forms.PictureBox();
             this.chessPanel = new System.Windows.Forms.Panel();
+            this.resultLabel = new System.Windows.Forms.Label();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.layerImageBox)).BeginInit();
@@ -179,11 +180,22 @@
             this.chessPanel.Size = new System.Drawing.Size(600, 800);
             this.chessPanel.TabIndex = 17;
             // 
+            // resultLabel
+            // 
+            this.resultLabel.AutoSize = true;
+            this.resultLabel.Font = new System.Drawing.Font("宋体", 72F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.resultLabel.Location = new System.Drawing.Point(90, 715);
+            this.resultLabel.Name = "resultLabel";
+            this.resultLabel.Size = new System.Drawing.Size(140, 97);
+            this.resultLabel.TabIndex = 18;
+            this.resultLabel.Text = ":)";
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1072, 837);
+            this.Controls.Add(this.resultLabel);
             this.Controls.Add(this.chessPanel);
             this.Controls.Add(this.groupBox3);
             this.Name = "Server";
@@ -194,6 +206,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.layerImageBox)).EndInit();
             this.chessPanel.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -213,5 +226,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.PictureBox layerImageBox;
         private System.Windows.Forms.Panel chessPanel;
+        private System.Windows.Forms.Label resultLabel;
     }
 }

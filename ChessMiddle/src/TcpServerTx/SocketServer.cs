@@ -5,6 +5,7 @@ using ChessMiddle.PublicTool;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -26,6 +27,7 @@ namespace ChessMiddle
             Port = port;
             if (state == null)
                 state = new List<TcpState>();
+            Thread.CurrentThread.Name = "main";
         }
 
         private Xytq _chess;
@@ -108,12 +110,12 @@ namespace ChessMiddle
             //实例化一个西洋跳棋
             char[,] layout = new char[8, 8]{
                     {'0',  'B', '0',  'a',  '0',  'a',  '0',  'a' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  '0',  '0',  '0',  '0',  '0' },
                     {'0',  'a', '0',  '0',  'a',  '0',  'a',  '0' },
-                    {'0',  '0', '0',  '0',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', 'a',  '0',  '0',  '0',  '0',  '0' },
                     {'0',  '0', '0',  '0',  'a',  '0',  '0',  '0' },
                     {'0',  '0', '0',  'b',  '0',  '0',  '0',  '0' },
-                    {'0',  '0', 'a',  'a',  '0',  '0',  '0',  '0' },
+                    {'0',  '0', '0',  'a',  '0',  '0',  '0',  '0' },
                     {'0',  '0', '0',  '0',  'b',  '0',  'b',  '0' }
             };
             _chess = new Xytq();
@@ -187,11 +189,9 @@ namespace ChessMiddle
             //todo 当客户端断开源码会自动执行这个回调? 如何避免
             TcpState stateOne = (TcpState)ar.AsyncState;
             Socket handler = stateOne.WorkSocket;
-            Console.WriteLine("in callback");
             try
             {
                 int bytesRead = handler.EndReceive(ar);
-                Console.WriteLine("read size :" + bytesRead);
                 if (bytesRead > 0)
                 {
                     byte[] haveDate = ReceiveDateOne.DateOneManage(stateOne, bytesRead);//接收完成之后对数组进行重置
@@ -214,7 +214,6 @@ namespace ChessMiddle
         {
             Dictionary<string, object> data = (Dictionary<string, object>)dic;
             string type = (string)data["type"];
-            Console.WriteLine(type);
             switch (type)
             {
                 case "close":
@@ -235,7 +234,6 @@ namespace ChessMiddle
                         {
                             changes.Add(i);
                         }
-
                         //下棋并检测合法性
                         //合法性失败发送违法api,并允许其继续在限制时间内下棋
                         if (!_chess.DoChess(changes, role))
@@ -251,7 +249,7 @@ namespace ChessMiddle
                         char result = _chess.GetResult();
                         //todo 将行动的棋显示在UI上
                         OnChessPlay(changes, _chess.ChessLayout, role, result);
-                        sendResult(result);
+                        sendResult(result, true);
 
                         if (result == _chess.NOT_DONE)
                             refreshAndNext(stateOne);
@@ -267,8 +265,9 @@ namespace ChessMiddle
         /// <summary>
         /// 判断局势并发送相应接口通知客户端
         /// </summary>
-        /// <param name="result"></param>
-        internal void sendResult(char result)
+        /// <param name="result">代表结果的字符</param>
+        /// <param name="win">result如果是身份，win代表是赢是输</param>
+        internal void sendResult(char result, Boolean win)
         {
             if (result != _chess.NOT_DONE)
             {
@@ -287,11 +286,25 @@ namespace ChessMiddle
                     {
                         if (player == result)
                         {
-                            Send(roleTable[player], API.getResultAPI("win"));
+                            if (win)
+                            {
+                                Send(roleTable[player], API.getResultAPI("win"));
+                            }
+                            else
+                            {
+                                Send(roleTable[player], API.getResultAPI("fail"));
+                            }
                         }
                         else
                         {
-                            Send(roleTable[player], API.getResultAPI("fail"));
+                            if (win)
+                            {
+                                Send(roleTable[player], API.getResultAPI("fail"));
+                            }
+                            else
+                            {
+                                Send(roleTable[player], API.getResultAPI("win"));
+                            }
                         }
                     }
                 }
@@ -313,7 +326,7 @@ namespace ChessMiddle
             }
         }
         #endregion
-
+        
         #region 通知下一个玩家并检测是否超时
 
         private void refreshAndNext(StateBase state)
@@ -325,7 +338,8 @@ namespace ChessMiddle
             int newStatePostion = oldStatePostion + 1 == this.state.Count
                 ? 0 : oldStatePostion + 1;
             currentToken = this.state[newStatePostion];
-
+            //等到UI画完后才通知下一个选手
+            Thread.Sleep(2000);
             sendNextEpisode(currentToken,
                 (CommonMethod.getKeyByValue(roleTable, currentToken)[0].ToString()));
         }
@@ -352,7 +366,6 @@ namespace ChessMiddle
         {
             TcpState stateOne = (TcpState)state;
             DateTime startTime = DateTime.Now;
-
             while (true)
             {
                 Thread.Sleep(50);
@@ -366,21 +379,47 @@ namespace ChessMiddle
                 {
                     if (!clientCheck(stateOne.IpEndPoint))
                         return;
-                   
-                    //使用默认走棋方法
-                    char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
-                    Send(stateOne, API.getTimeoutAPI());
-                    List<string> changes = _chess.DefaultDo(role);
-                    char result = _chess.GetResult();
+                    
+                    ////直接判输方法
+                    char loser = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
+                    char winner = getOtherGamer(loser);
+                    OnChessPlay(new List<string>(), _chess.ChessLayout, '0', winner);
+                    sendResult(loser, false);
+                    
+                    
 
-                    OnChessPlay(changes, _chess.ChessLayout, role, result);
-                    sendResult(result);
-                    if (result == _chess.NOT_DONE)
-                        refreshAndNext(stateOne);
+                    ////使用默认走棋方法
+                    //char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];
+                    //Send(stateOne, API.getTimeoutAPI());
+                    //List<string> changes = _chess.DefaultDo(role);
+                    //char result = _chess.GetResult();
+
+                    //OnChessPlay(changes, _chess.ChessLayout, role, result);
+                    //sendResult(result);
+                    //if (result == _chess.NOT_DONE)
+                    //{
+                    //    refreshAndNext(stateOne);
+                    //}
+
                     return;
                 }
             }
         }
+
+        private char getOtherGamer(char loser)
+        {
+            char winner = '0';
+            foreach(char kv in roleTable.Keys)
+            {
+                if (loser != kv)
+                {
+                    winner = kv;
+                    break;
+                } 
+            }
+            return winner;
+        }
+
         #endregion
 
         #region 向客户端发送数据的区块
