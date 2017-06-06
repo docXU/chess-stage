@@ -54,7 +54,7 @@ namespace ChessMiddle.ChessFactory
         ///     2.平局,返回平局码('d')
         /// </summary>
         /// <returns>返回一个代表结果的字符</returns>
-        char GetResult();
+        char GetResult(char who);
 
         /// <summary>
         /// 执行角色role的默认步

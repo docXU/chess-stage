@@ -16,14 +16,13 @@ namespace SocketServer
         private ITxServer server = null;
         private PictureBox[] blackItems;
         private PictureBox[] redItems;
-        private Boolean PieceIsMoving;
+        Object locker = new Object();
 
         public Server()
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
             chessUIInit();
-            PieceIsMoving = false;
         }
 
         /// <summary>
@@ -180,6 +179,7 @@ namespace SocketServer
 
         private void movePieceAsyn(List<string> actionMove, char[,] layout, char role, char result)
         {
+            LockMoving lockv = new LockMoving(false);
             new Thread(new ThreadStart(() =>
             {
                 foreach (string s in actionMove)
@@ -188,7 +188,6 @@ namespace SocketServer
                 }
                 foreach (string s in actionMove)
                 {
-                    Console.WriteLine("do move: " + s);
                     Thread.Sleep(10);
                     string[] posFormat = Regex.Split(s, "-");
                     int startPointX = Convert.ToInt32(posFormat[0].Split(',')[0]);
@@ -202,7 +201,7 @@ namespace SocketServer
                     {
                         victimPos = GetAbsoluteLocation((startPointX + endPointX) / 2, (endPointY + startPointY) / 2);
                     }
-                    PieceIsMoving = true;
+                    lockv.LockV = true;
                     if (role == 'a')
                     {
                         foreach (PictureBox pb in blackItems)
@@ -211,7 +210,7 @@ namespace SocketServer
                             {
                                 new Thread(new ThreadStart(() =>
                                 {
-                                    moveFun(pb, startPos, endPos);
+                                    moveFun(pb, startPos, endPos, lockv);
                                     if (endPointX == 7)
                                     {
                                         pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\blackKing.png");
@@ -248,7 +247,7 @@ namespace SocketServer
                             {
                                 new Thread(new ThreadStart(() =>
                                 {
-                                    moveFun(pb, startPos, endPos);
+                                    moveFun(pb, startPos, endPos, lockv);
                                     if (endPointX == 0)
                                     {
                                         pb.ImageLocation = System.IO.Path.Combine(Application.StartupPath + @"\..\..\res\redKing.png");
@@ -278,9 +277,9 @@ namespace SocketServer
                         }
                     }
 
-                    while (PieceIsMoving == true)
+                    while (lockv.LockV == true)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(1);
                     }
 
                 }
@@ -290,21 +289,22 @@ namespace SocketServer
 
         private void playChess(List<string> actionMove, char[,] layout, char role, char result)
         {
-            //画面的UI处理函数
-            convertToUI(layout, result);
-            if (result == 'a' || result == 'b')
+            //线程锁,某个线程发现这段代码正被执行就会等待
+            lock(locker)
             {
-                resultLabel.Text = "winner：" + result;
-            }
-            else
-            {
+                //画面的UI处理函数
+                convertToUI(layout, result);
                 movePieceAsyn(actionMove, layout, role, result);
+                if (result == 'a' || result == 'b')
+                {
+                    resultLabel.Text = "winner：" + result;
+                }
             }
         }
 
-        private void moveFun(PictureBox piece, Point startPoint, Point endPoint)
+        private void moveFun(PictureBox piece, Point startPoint, Point endPoint, LockMoving lockMoving)
         {
-            int speed = 4;
+            int speed = 3;
             while (1 == 1)
             {
                 int xVector = (endPoint.X - startPoint.X) > 0 ? 1 : -1;
@@ -312,8 +312,7 @@ namespace SocketServer
                 piece.Location = new Point(piece.Location.X + xVector, piece.Location.Y + yVector);
                 if (piece.Location.Equals(endPoint))
                 {
-                    Console.WriteLine("move end");
-                    PieceIsMoving = false;
+                    lockMoving.LockV = false;
                     break;
                 }
                 Thread.Sleep(speed);

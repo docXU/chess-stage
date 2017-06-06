@@ -140,26 +140,35 @@ namespace ChessMiddle.ChessFactory
             return false;
         }
 
-        public char GetResult()
+        public char GetResult(char nowPlayer)
         {
-            Dictionary<List<string>, char[,]> RoleFirstNext = NextLayout(Role[0], _chessLayout);
-            if (RoleFirstNext.Keys.Count == 0)
+            
+            char nextPlayer;
+            if (nowPlayer == Role[0])
             {
-                return Role[1];
+                nextPlayer = Role[1];
+            }
+            else
+            {
+                nextPlayer = Role[0];
             }
 
-            Dictionary<List<string>, char[,]> RoleSecondNext = NextLayout(Role[1], _chessLayout);
-            if (RoleSecondNext.Keys.Count == 0)
-            {
-                return Role[0];
-            }
+            Dictionary<List<string>, char[,]> Nexts = NextLayout(nextPlayer, _chessLayout);
+            Dictionary<List<string>, char[,]> NextNexts = NextLayout(nowPlayer, _chessLayout);
 
-            if (RoleFirstNext.Keys.Count != 0 && RoleSecondNext.Keys.Count != 0)
+            if (Nexts.Keys.Count == 0)
+            {
+                if (NextNexts.Keys.Count == 0)
+                {
+                    return DRAW;
+                }
+                return nowPlayer;
+            }
+            else
             {
                 return NOT_DONE;
             }
 
-            return DRAW;
         }
 
 
@@ -396,13 +405,14 @@ namespace ChessMiddle.ChessFactory
             return layoutDic;
         }
 
-        public void continueJump(char[,] layout, int x, int y, char player, int rival, Dictionary<List<string>, char[,]> a, List<string> actionMove)
+        public void continueJump(char[,] layout, int x, int y, char player, char rival, Dictionary<List<string>, char[,]> a, List<string> actionMove)
         {
             int flag = 0;
             int LENGTH = _width;
+            char rival_king = Char.ToUpper(rival);
             if (player == BLACK || player == WHITE_KING || player == BLACK_KING)
             {
-                if (x - 2 >= 0 && y - 2 >= 0 && layout[x - 1, y - 1] == rival && layout[x - 2, y - 2] == EMPTY)
+                if (x - 2 >= 0 && y - 2 >= 0 && (layout[x - 1, y - 1] == rival || layout[x - 1, y - 1] == rival_king) && layout[x - 2, y - 2] == EMPTY)
                 {
                     flag = 1;
                     char[,] t = new char[LENGTH, LENGTH];
@@ -416,7 +426,7 @@ namespace ChessMiddle.ChessFactory
                     newActionMove.Add("" + x + "," + y + "-" + (x - 2) + "," + (y - 2));
                     continueJump(t, x - 2, y - 2, player, rival, a, newActionMove);
                 }
-                if (x - 2 >= 0 && y + 2 < LENGTH && layout[x - 1, y + 1] == rival && layout[x - 2, y + 2] == EMPTY)
+                if (x - 2 >= 0 && y + 2 < LENGTH && (layout[x - 1, y + 1] == rival || layout[x - 1, y + 1] == rival_king) && layout[x - 2, y + 2] == EMPTY)
                 {
                     flag = 1;
                     char[,] t = new char[LENGTH, LENGTH];
@@ -433,7 +443,7 @@ namespace ChessMiddle.ChessFactory
             }
             if (player == WHITE || player == WHITE_KING || player == BLACK_KING)
             {
-                if (x + 2 < LENGTH && y - 2 >= 0 && layout[x + 1, y - 1] == rival && layout[x + 2, y - 2] == EMPTY)
+                if (x + 2 < LENGTH && y - 2 >= 0 && (layout[x + 1, y - 1] == rival||layout[x + 1, y - 1] == rival_king) && layout[x + 2, y - 2] == EMPTY)
                 {
                     flag = 1;
                     char[,] t = new char[LENGTH, LENGTH];
@@ -447,7 +457,7 @@ namespace ChessMiddle.ChessFactory
                     newActionMove.Add("" + x + "," + y + "-" + (x + 2) + "," + (y - 2));
                     continueJump(t, x + 2, y - 2, player, rival, a, newActionMove);
                 }
-                if (x + 2 < LENGTH && y + 2 < LENGTH && layout[x + 1, y + 1] == rival && layout[x + 2, y + 2] == EMPTY)
+                if (x + 2 < LENGTH && y + 2 < LENGTH && (layout[x + 1, y + 1] == rival|| layout[x + 1, y + 1] == rival_king) && layout[x + 2, y + 2] == EMPTY)
                 {
                     flag = 1;
                     char[,] t = new char[LENGTH, LENGTH];

@@ -246,7 +246,7 @@ namespace ChessMiddle
                         //多线程可同时读一个内存变量,而写要加锁
                         stateOne.ThinkInTime = true;
 
-                        char result = _chess.GetResult();
+                        char result = _chess.GetResult(role);
                         //todo 将行动的棋显示在UI上
                         OnChessPlay(changes, _chess.ChessLayout, role, result);
                         sendResult(result, true);
@@ -385,8 +385,6 @@ namespace ChessMiddle
                     char winner = getOtherGamer(loser);
                     OnChessPlay(new List<string>(), _chess.ChessLayout, '0', winner);
                     sendResult(loser, false);
-                    
-                    
 
                     ////使用默认走棋方法
                     //char role = (char)CommonMethod.getKeyByValue(roleTable, stateOne)[0];

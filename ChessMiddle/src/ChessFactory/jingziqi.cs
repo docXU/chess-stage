@@ -92,7 +92,7 @@ namespace ChessMiddle.ChessFactory
         /// 获得当前棋局的结果
         /// </summary>
         /// <returns>代表当前结果的字符</returns>
-        public char GetResult()
+        public char GetResult(char who)
         {
             //检测某列是否有胜者
             bool isVertical;
