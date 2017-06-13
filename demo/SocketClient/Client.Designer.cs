@@ -35,11 +35,10 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.notify = new System.Windows.Forms.Label();
             this.ableMoveCB = new System.Windows.Forms.ComboBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.notify = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -100,7 +99,6 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.notify);
-            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.ableMoveCB);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.button8);
@@ -116,6 +114,17 @@
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "TCP客户端区";
+            // 
+            // notify
+            // 
+            this.notify.AutoSize = true;
+            this.notify.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.notify.ForeColor = System.Drawing.SystemColors.Desktop;
+            this.notify.Location = new System.Drawing.Point(149, 191);
+            this.notify.Name = "notify";
+            this.notify.Size = new System.Drawing.Size(55, 14);
+            this.notify.TabIndex = 10;
+            this.notify.Text = "label4";
             // 
             // ableMoveCB
             // 
@@ -145,26 +154,6 @@
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 17);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "label3";
-            // 
-            // notify
-            // 
-            this.notify.AutoSize = true;
-            this.notify.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.notify.ForeColor = System.Drawing.SystemColors.Desktop;
-            this.notify.Location = new System.Drawing.Point(149, 191);
-            this.notify.Name = "notify";
-            this.notify.Size = new System.Drawing.Size(55, 14);
-            this.notify.TabIndex = 10;
-            this.notify.Text = "label4";
-            // 
             // Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -190,7 +179,6 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox ableMoveCB;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label notify;
     }
 }
