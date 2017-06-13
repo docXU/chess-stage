@@ -1,7 +1,10 @@
 ﻿using ChessMiddle.Basics;
+using ChessMiddle.ChessFactory;
 using ChessMiddle.PublicClass;
 using ChessMiddle.PublicTool;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -19,6 +22,7 @@ namespace ChessMiddle
         /// 服务器分配的玩家角色
         /// </summary>
         public char Player { get => _player; set => _player = value; }
+        private Xytq chess;
 
         #region 基本属性区块
         private TcpState stateOne = null;
@@ -35,6 +39,12 @@ namespace ChessMiddle
         /// 客户端登录成功或失败都会触发此事件,登录失败的话会有失败的原因
         /// </summary>
         public event TxDelegate<bool, string> StartResult;
+
+        /// <summary>
+        /// 当轮到本方下棋时,显示所有可行解
+        /// </summary>
+        public event TxDelegate<List<List<string>>> ShowAbleMove;
+
         /// <summary>
         /// 当连接断开时是否重连,默认重连;
         /// </summary>
@@ -78,6 +88,7 @@ namespace ChessMiddle
         /// </summary>
         private void start()
         {
+            chess = new Xytq();
             if (reconnectOn)//如果是重连的延迟10秒
                 Thread.Sleep(9000);
             try
@@ -213,9 +224,9 @@ namespace ChessMiddle
                 if (bytesRead > 0)
                 {
                     //MessageBox.Show(stateOne.Buffer[0].ToString());
-                    byte[] haveDate = ReceiveDateOne.DateOneManage(stateOne, bytesRead);//接收完成之后对数组进行重置
+                    byte[] haveDate = ReceiveDateOne.DateOneManage(stateOne, bytesRead); //接收完成之后对数组进行重置
                     handler.BeginReceive(stateOne.Buffer, 0, stateOne.Buffer.Length, 0, new AsyncCallback(ReadCallback), stateOne);
-                    TcpDateOne(stateOne, haveDate);
+                    dataClassify(TcpDateOne(stateOne, haveDate));
                 }
                 else { handler.BeginReceive(stateOne.Buffer, 0, stateOne.Buffer.Length, 0, new AsyncCallback(ReadCallback), stateOne); }
             }
@@ -225,6 +236,30 @@ namespace ChessMiddle
             }
         }
         #endregion
+
+        private void dataClassify(Dictionary<string, object> data)
+        {
+            switch((string)data["type"])
+            {
+                case "do_algorithm":
+                {
+                    Console.WriteLine("in do");
+                    SendList(chess.NextLayout(( (string)data["role"]).ToCharArray()[0], Convertor.arrayListTo2D(data["now"]) ));
+                    chess.Print(Convertor.arrayListTo2D(data["now"]));
+                    break;
+                }
+            }
+        }
+
+        private void SendList(Dictionary<List<string>, char[,]> dictionary)
+        {
+            List<List<string>> ableMove = new List<List<string>>();
+            foreach(List<string> one in dictionary.Keys)
+            {
+                ableMove.Add(one);
+            }
+            CommonMethod.eventInvoket(() => { ShowAbleMove (ableMove); });
+        }
 
         #region 发送信息区块
         /// <summary>

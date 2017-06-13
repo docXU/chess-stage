@@ -1,4 +1,5 @@
 ﻿using ChessMiddle.Basics;
+using System.Collections.Generic;
 
 namespace ChessMiddle
 {
@@ -15,6 +16,10 @@ namespace ChessMiddle
         /// 自动重连开始的时候,触发此事件
         /// </summary>
         event TxDelegate ReconnectionStart;
+        /// <summary>
+        /// 当轮到本方下棋时,显示所有可行解
+        /// </summary>
+        event TxDelegate<List<List<string>>> ShowAbleMove;
        /// <summary>
         /// 当连接断开时是否重连,0为不重连,默认重连三次;
        /// </summary>

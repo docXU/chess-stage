@@ -405,6 +405,18 @@ namespace ChessMiddle.ChessFactory
             return layoutDic;
         }
 
+        internal void Print(char[,] v)
+        {
+            for(int i =0;i<8;i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Console.Write(v[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
         public void continueJump(char[,] layout, int x, int y, char player, char rival, Dictionary<List<string>, char[,]> a, List<string> actionMove)
         {
             int flag = 0;

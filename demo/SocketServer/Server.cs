@@ -117,7 +117,7 @@ namespace SocketServer
                 server.EngineClose += new TxDelegate(engineClose);
                 server.EngineLost += new TxDelegate<string>(engineLost);
                 server.PlayChess += new TxDelegate<List<string>, char[,], char, char>(playChess);
-                server.LimitThinkSeconds = 3;
+                server.LimitThinkSeconds = 300;
                 server.StartEngine();
                 this.button1.Enabled = false;
                 chessInit(server.GetChessLayout());

@@ -1,5 +1,6 @@
 ﻿using ChessMiddle.PublicClass;
 using ChessMiddle.PublicTool;
+using System;
 using System.Collections.Generic;
 using System.Text;
 namespace ChessMiddle.Basics
@@ -17,6 +18,7 @@ namespace ChessMiddle.Basics
         internal Dictionary<string,object> TcpDateOne(TcpState stateOne, byte[] reciverByte)
         {
             string json =Encoding.Default.GetString(reciverByte);
+            Console.WriteLine(json);
             return jsonAndDictionary.JsonToDictionary(json);
         }
 

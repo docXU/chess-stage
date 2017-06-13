@@ -57,6 +57,7 @@
     <Compile Include="ChessFactory\jingziqi.cs" />
     <Compile Include="ChessFactory\xytq.cs" />
     <Compile Include="PublicClass\API.cs" />
+    <Compile Include="PublicTool\Convertor.cs" />
     <Compile Include="PublicTool\jsonAndDictionary.cs" />
     <Compile Include="PublicTool\ReceiveDateOne.cs" />
     <Compile Include="PublicClass\TcpState.cs" />

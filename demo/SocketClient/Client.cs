@@ -21,11 +21,32 @@ namespace SocketClient
                 TxClient.EngineLost += new TxDelegate<string>(engineLost);//当客户端非正常原因断开的时候
                 TxClient.ReconnectionStart += new TxDelegate(reconnectionStart);//当自动重连开始的时候
                 TxClient.StartResult += new TxDelegate<bool, string>(startResult);//当登录完成的时候
+                TxClient.ShowAbleMove += new TxDelegate<List<List<string>>>(showAbleMove);//当轮到行走时,显示所有可行解
                 TxClient.StartEngine();
+                notify.Text = "* 连上了,等一下AI...";
             }
             catch (Exception Ex)
             {
                 MessageBox.Show(Ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 当轮到行走时,显示所有可行解
+        /// </summary>
+        /// <param name="object1"></param>
+        private void showAbleMove(List<List<string>> object1)
+        {
+            ableMoveCB.Items.Clear();
+            notify.Text = "* 轮到你了!";
+            foreach (List<string> movelist in object1)
+            {
+                string stringMovelist = "";
+                foreach(string moveone in movelist)
+                {
+                    stringMovelist += moveone + " ";
+                }
+                ableMoveCB.Items.Add(stringMovelist);
             }
         }
 
@@ -95,6 +116,7 @@ namespace SocketClient
         {
             InitializeComponent();
             this.FormClosing += Client_FormClosing;
+            notify.Text = "* Notify";
         }
 
         private void Client_FormClosing(object sender, FormClosingEventArgs e)
@@ -108,12 +130,21 @@ namespace SocketClient
         private void button1_Click(object sender, EventArgs e)
         {
             List<string> action = new List<string>();
-            //action.Add("m/5,6-6,8/a");
-            //action.Add("aasdasdasd");
-            string actionString = textBox4.Text;
-            action.Add(actionString);
-
-            TxClient.sendMessage(API.getActionAPI(action, "a"));
+            string actionString = (string)ableMoveCB.SelectedItem;
+            if (actionString != null && actionString.Length > 5)
+            {
+                string[] movelist = actionString.Split(' ');
+                int arrayLength = movelist.Length;
+                arrayLength--;
+                for(int i =0;i<arrayLength;i++)
+                {   
+                    Console.WriteLine(movelist[i]);
+                    action.Add(movelist[i]);
+                }
+                TxClient.sendMessage(API.getActionAPI(action, "nervermind"));
+                notify.Text = "* AI在思考...";
+            }
+            
         }
     }
 
